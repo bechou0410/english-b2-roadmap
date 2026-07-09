@@ -918,6 +918,12 @@ a:hover { color: var(--accent-deep); }
   .nav-toggle { display: inline-flex; order: 5; }
   /* vòng % tổng dư thừa trên mobile (đã có ở trang Thành tích) — ẩn cho gọn header */
   .header-progress { display: none; }
+  /* nút tài khoản chuyển vào trong menu trên mobile (đặc tả cao hơn base để
+     thắng bất kể thứ tự nguồn) */
+  .site-header .account-btn { display: none; }
+  /* Safari iOS: nền header trong suốt 86% làm nội dung cuộn lộ qua phía trên —
+     dùng nền ĐẶC trên mobile để bịt hẳn (blur không cần vì không còn xuyên thấu) */
+  .site-header { background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
 
   .site-nav {
     position: absolute;
@@ -942,12 +948,31 @@ a:hover { color: var(--accent-deep); }
   }
   .site-header.nav-open .site-nav { transform: none; opacity: 1; visibility: visible; }
 
-  .site-nav > a {
+  .site-nav > a,
+  .nav-account {
     padding: 0.85rem 0.4rem;
     font-size: 1.02rem;
     border-bottom: 1px solid var(--line-soft);
   }
   .site-nav > a:hover { border-bottom-color: var(--line-soft); }
+  /* mục Tài khoản trong panel mobile (đặc tả cao hơn base .nav-account) */
+  .site-nav .nav-account {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: var(--font-body);
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .nav-account.is-in { color: var(--s4); }
+  .nav-account.is-in svg { color: var(--s4); }
 
   /* nhóm "Học tập" phẳng ra thành mục có nhãn, không cần bấm mở */
   .nav-group { position: static; }
@@ -1892,6 +1917,10 @@ a.streak-chip:hover { border-color: var(--s3); color: var(--ink); }
 .account-btn.is-in svg { color: var(--s4); }
 /* icon nét mảnh trong các nút của hộp thoại tài khoản */
 .btn-ico { width: 18px; height: 18px; flex: none; }
+
+/* bản "Tài khoản" trong menu — chỉ hiện trên mobile (xem media query ≤680px) */
+.nav-account { display: none; }
+.nav-account svg { width: 20px; height: 20px; }
 .account-btn.is-in { border-color: var(--s3); background: color-mix(in srgb, var(--s2) 14%, var(--surface)); }
 .account-btn.is-in::after {
   content: "";

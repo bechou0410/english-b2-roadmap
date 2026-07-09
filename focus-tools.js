@@ -420,9 +420,9 @@
     toggle.addEventListener("click", function () {
       setOpen(!header.classList.contains("nav-open"));
     });
-    /* đóng khi bấm một link, bấm ra ngoài, hoặc Escape */
+    /* đóng khi bấm một link / mục tài khoản, bấm ra ngoài, hoặc Escape */
     nav.addEventListener("click", function (e) {
-      if (e.target.closest("a")) setOpen(false);
+      if (e.target.closest("a, .nav-account")) setOpen(false);
     });
     document.addEventListener("click", function (e) {
       if (header.classList.contains("nav-open") &&

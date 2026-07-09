@@ -510,29 +510,41 @@
   }
 
   /* ---------- nút tài khoản trên header ---------- */
-  var accountBtn;
+  var accountBtn, navAccount;
+  function makeTrigger(cls, withText) {
+    var b = document.createElement("button");
+    b.className = cls;
+    b.type = "button";
+    b.setAttribute("aria-label", "Tài khoản và sao lưu");
+    b.innerHTML = ICONS.user + (withText ? " <span>Tài khoản</span>" : "");
+    b.addEventListener("click", openModal);
+    return b;
+  }
   function injectAccountButton() {
     var header = document.querySelector(".header-inner");
     if (!header) return;
-    accountBtn = document.createElement("button");
-    accountBtn.className = "account-btn";
-    accountBtn.type = "button";
-    accountBtn.setAttribute("aria-label", "Tài khoản và sao lưu");
-    accountBtn.innerHTML = ICONS.user;
-    /* đặt trước vòng tiến độ / hamburger nếu có */
+    /* bản icon trên header (chỉ hiện desktop) */
+    accountBtn = makeTrigger("account-btn", false);
     var ring = header.querySelector(".header-progress");
     var toggle = header.querySelector(".nav-toggle");
     header.insertBefore(accountBtn, ring || toggle || null);
-    accountBtn.addEventListener("click", openModal);
+    /* bản trong menu (chỉ hiện mobile) — đặt cuối danh sách nav */
+    var nav = document.querySelector(".site-nav");
+    if (nav) { navAccount = makeTrigger("nav-account", true); nav.appendChild(navAccount); }
     refreshBadge();
   }
   function refreshBadge() {
-    if (!accountBtn) return;
-    if (!CLOUD) { accountBtn.classList.remove("is-in"); return; }
-    isLoggedIn().then(function (yes) {
-      accountBtn.classList.toggle("is-in", yes);
-      accountBtn.title = yes ? "Đã đăng nhập — nhấn để đồng bộ/đăng xuất" : "Đăng nhập để đồng bộ đa thiết bị";
-    });
+    function apply(yes) {
+      [accountBtn, navAccount].forEach(function (b) {
+        if (!b) return;
+        b.classList.toggle("is-in", yes);
+        b.title = yes ? "Đã đăng nhập — nhấn để đồng bộ/đăng xuất" : "Đăng nhập để đồng bộ đa thiết bị";
+        var t = b.querySelector("span");
+        if (t) t.textContent = yes ? "Tài khoản · đã đăng nhập" : "Tài khoản";
+      });
+    }
+    if (!CLOUD) { apply(false); return; }
+    isLoggedIn().then(apply);
   }
 
   /* ---------- khởi động ---------- */

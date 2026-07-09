@@ -914,8 +914,10 @@ a:hover { color: var(--accent-deep); }
 @media (max-width: 680px) {
   /* MOBILE: hamburger mở panel dọc toàn chiều rộng dưới header */
   .header-inner { gap: 0.6rem; }
-  .brand { margin-right: auto; }
+  .brand { margin-right: auto; white-space: nowrap; }
   .nav-toggle { display: inline-flex; order: 5; }
+  /* vòng % tổng dư thừa trên mobile (đã có ở trang Thành tích) — ẩn cho gọn header */
+  .header-progress { display: none; }
 
   .site-nav {
     position: absolute;

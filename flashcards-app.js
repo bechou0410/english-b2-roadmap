@@ -9,6 +9,7 @@
   "use strict";
 
   var DECKS = window.FLASHDECKS;
+  var TOPICS = window.FLASHDECKS_TOPICS || []; /* bộ thẻ theo chủ đề (bổ sung) */
   var root = document.getElementById("flashcards-root");
   if (!DECKS || !DECKS.length) {
     root.innerHTML = "<p>Không tải được dữ liệu thẻ. Hãy kiểm tra file <code>flashcards-data.js</code>.</p>";
@@ -18,6 +19,7 @@
   var SRS_KEY = "b2-srs-v1";
   var CUSTOM_KEY = "b2-flashcards-custom-v1";
   var STAGE_SEL_KEY = "b2-flash-stage";
+  var SOURCE_KEY = "b2-flash-source"; /* nguồn từ mới: "stage-N" hoặc "topic-<id>" */
   var NEW_PER_SESSION = 10;
   var INTERVAL_DAYS = { 1: 1, 2: 3, 3: 7, 4: 16, 5: 35 }; /* hộp → số ngày chờ */
   var MAX_BOX = 5;
@@ -96,10 +98,27 @@
       };
     });
   }
+  function topicCards(topic) {
+    return topic.cards.map(function (c) {
+      return { id: "t:" + topic.topic_id + ":" + c.en.toLowerCase(), card: c, topic: topic.topic_id };
+    });
+  }
   function allCards() {
     var out = [];
     DECKS.forEach(function (_, si) { out = out.concat(stageCards(si)); });
+    TOPICS.forEach(function (t) { out = out.concat(topicCards(t)); });
     return out.concat(customCards());
+  }
+
+  /* nguồn từ mới đang chọn: {type:'stage', stage:n} hoặc {type:'topic', topic:obj} */
+  function selectedSource() {
+    var v = localStorage.getItem(SOURCE_KEY) || "";
+    var m = v.match(/^topic-(.+)$/);
+    if (m) {
+      var t = TOPICS.filter(function (x) { return x.topic_id === m[1]; })[0];
+      if (t) return { type: "topic", topic: t };
+    }
+    return { type: "stage", stage: selectedStage() };
   }
 
   function dueList(srs) {
@@ -109,10 +128,12 @@
       return st && st.due <= t;
     });
   }
-  function newList(srs, si) {
+  function newList(srs) {
     /* thẻ tuỳ chỉnh mới luôn được ưu tiên (người học vừa chủ động lưu chúng) */
     var fresh = customCards().filter(function (c) { return !srs[c.id]; });
-    return fresh.concat(stageCards(si).filter(function (c) { return !srs[c.id]; }));
+    var src = selectedSource();
+    var pool = src.type === "topic" ? topicCards(src.topic) : stageCards(src.stage - 1);
+    return fresh.concat(pool.filter(function (c) { return !srs[c.id]; }));
   }
   function counts(srs) {
     var learning = 0, mastered = 0;
@@ -160,7 +181,7 @@
     var srs = loadObj(SRS_KEY);
     var si = selectedStage();
     var due = dueList(srs);
-    var fresh = newList(srs, si - 1);
+    var fresh = newList(srs);
     var c = counts(srs);
     var sessionSize = due.length + Math.min(fresh.length, NEW_PER_SESSION);
 
@@ -179,9 +200,14 @@
         : '<p class="exercise-hint" style="margin:0;">Hết thẻ cho hôm nay 🎉 — quay lại vào ngày mai để giữ nhịp.</p>') +
       "</div>" +
       '<p class="panel-label" style="margin-top:1.6rem;">Lấy từ mới từ chặng</p>' +
-      '<div class="stage-switch" id="flash-stage-switch"></div>';
+      '<div class="stage-switch" id="flash-stage-switch"></div>' +
+      (TOPICS.length
+        ? '<p class="panel-label" style="margin-top:1.4rem;">Hoặc học theo chủ đề</p>' +
+          '<div class="topic-grid" id="flash-topic-switch"></div>'
+        : "");
     root.appendChild(dash);
 
+    var src = selectedSource();
     var sw = dash.querySelector("#flash-stage-switch");
     var unlocked = window.Progression ? Progression.unlockedStage() : DECKS.length;
     DECKS.forEach(function (_, i) {
@@ -194,21 +220,38 @@
       b.type = "button";
       b.style.setProperty("--sw-c", "var(--s" + (i + 1) + ")");
       b.style.setProperty("--sw-ink", "var(--s" + (i + 1) + "-ink)");
-      b.setAttribute("aria-pressed", i + 1 === si ? "true" : "false");
+      b.setAttribute("aria-pressed", src.type === "stage" && i + 1 === src.stage ? "true" : "false");
       b.disabled = locked;
       if (locked && window.Progression) b.title = Progression.lockHint(i + 1);
       b.addEventListener("click", function () {
         localStorage.setItem(STAGE_SEL_KEY, String(i + 1));
+        localStorage.setItem(SOURCE_KEY, "stage-" + (i + 1));
         renderDashboard();
       });
       sw.appendChild(b);
+    });
+
+    /* chủ đề — luôn dùng được (không khoá theo tiến trình) */
+    var tsw = dash.querySelector("#flash-topic-switch");
+    if (tsw) TOPICS.forEach(function (t) {
+      var remaining = topicCards(t).filter(function (x) { return !srs[x.id]; }).length;
+      var b = el("button", "topic-chip",
+        '<span class="topic-ico" aria-hidden="true">' + esc(t.icon) + "</span> " + esc(t.topic_vi) +
+        ' <span class="tab-count">' + remaining + "/" + t.cards.length + "</span>");
+      b.type = "button";
+      b.setAttribute("aria-pressed", src.type === "topic" && src.topic.topic_id === t.topic_id ? "true" : "false");
+      b.addEventListener("click", function () {
+        localStorage.setItem(SOURCE_KEY, "topic-" + t.topic_id);
+        renderDashboard();
+      });
+      tsw.appendChild(b);
     });
 
     var btn = dash.querySelector("#btn-review");
     if (btn) btn.addEventListener("click", function () {
       /* tính lại tại thời điểm bấm — dashboard có thể mở qua đêm hoặc tab khác vừa ôn */
       var s2 = loadObj(SRS_KEY);
-      startSession(dueList(s2), newList(s2, selectedStage() - 1));
+      startSession(dueList(s2), newList(s2));
     });
 
     renderCustomList();
@@ -300,7 +343,7 @@
     function finish() {
       if (window.speechSynthesis) speechSynthesis.cancel();
       var srs = loadObj(SRS_KEY);
-      var freshLeft = newList(srs, selectedStage() - 1).length;
+      var freshLeft = newList(srs).length;
       root.innerHTML = "";
       var end = el("div", "panel-card");
       end.setAttribute("tabindex", "-1");
@@ -318,7 +361,7 @@
       var more = document.getElementById("btn-more");
       if (more) more.addEventListener("click", function () {
         var s2 = loadObj(SRS_KEY);
-        startSession([], newList(s2, selectedStage() - 1));
+        startSession([], newList(s2));
       });
       if (window.FocusTools) {
         FocusTools.recordActivity();

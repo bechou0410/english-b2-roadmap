@@ -29,6 +29,14 @@
   function dayKey(d) {
     return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
   }
+  /* số ngày → chuỗi thời lượng dễ đọc */
+  function fmtDuration(days) {
+    if (days < 21) return days + " ngày";
+    if (days < 70) return Math.round(days / 7) + " tuần";
+    if (days < 365) return Math.round(days / 30) + " tháng";
+    var y = Math.floor(days / 365), m = Math.round((days % 365) / 30);
+    return y + " năm" + (m ? " " + m + " tháng" : "");
+  }
 
   var scores = loadObj("b2-lessons-v1");
   var srs = loadObj("b2-srs-v1");
@@ -107,6 +115,49 @@
     "<div><b>" + practiceDone + "</b><span>bài luyện đã đạt</span></div>" +
     "</div>";
   root.appendChild(stats);
+
+  /* ---------- bộ đếm: bắt đầu học từ khi nào + ước lượng tới B2 ---------- */
+  var started = loadObj("b2-started-v1");
+  var journey = el("div", "panel-card journey-card");
+  journey.style.marginTop = "1.2rem";
+  if (started && started.ts) {
+    var startDate = new Date(Number(started.ts));
+    var daysSince = Math.max(1, Math.floor((Date.now() - Number(started.ts)) / 86400000) + 1);
+    /* mức hoàn thành tổng thể = 60% bài học + 40% test chặng */
+    var completion = lessonsTotal
+      ? (lessonsDone / lessonsTotal) * 0.6 + (testsPassed / 4) * 0.4
+      : 0;
+    var pct = Math.round(completion * 100);
+    /* ước lượng: theo NHỊP thực (số ngày đã học), chiếu tới 100% */
+    var estText;
+    if (completion >= 1) {
+      estText = "Bạn đã hoàn thành phần lộ trình trên web — giờ là lúc luyện đề B2 thật. 🎉";
+    } else if (completion > 0.02 && totalDays >= 3) {
+      var perActiveDay = completion / totalDays;           // tiến độ mỗi ngày CÓ học
+      var activeDaysLeft = Math.ceil((1 - completion) / perActiveDay);
+      /* quy ra ngày lịch theo tần suất học hiện tại (ngày học / ngày trôi qua) */
+      var freq = Math.min(1, totalDays / daysSince);
+      var calDaysLeft = Math.ceil(activeDaysLeft / Math.max(freq, 0.15));
+      estText = "Theo nhịp hiện tại, dự kiến đạt B2 sau khoảng <b>" + fmtDuration(calDaysLeft) +
+        "</b> nữa. Học đều hơn thì tới đích nhanh hơn.";
+    } else {
+      estText = "Theo lộ trình chuẩn (học đều 9–12 giờ/tuần): khoảng <b>58–74 tuần</b>. Cứ giữ chuỗi mỗi ngày.";
+    }
+    journey.innerHTML =
+      '<p class="panel-label">Hành trình của bạn</p>' +
+      "<p>Bắt đầu học từ <b>" + startDate.toLocaleDateString("vi-VN") + "</b> — đã <b>" + daysSince +
+      " ngày</b> (học thật <b>" + totalDays + " ngày</b>).</p>" +
+      '<div class="stage-progress" style="margin:0.8rem 0;">' +
+      '<div class="stage-progress-bar"><div class="stage-progress-fill" style="width:' + pct + '%;background:var(--s4);"></div></div>' +
+      '<span class="stage-progress-num">' + pct + "%</span></div>" +
+      '<p class="exercise-hint" style="font-size:0.95rem;">' + estText + "</p>";
+  } else {
+    journey.innerHTML =
+      '<p class="panel-label">Hành trình của bạn</p>' +
+      '<p class="exercise-hint">Bạn chưa bắt đầu. Hoàn thành bài học đầu tiên để bắt đầu đếm ngày và ước lượng thời gian đạt B2. ' +
+      '<a href="lessons.html#next">Học ngay bài đầu tiên →</a></p>';
+  }
+  root.appendChild(journey);
 
   /* lịch hoạt động 12 tuần (kiểu GitHub) */
   var heat = el("div", "panel-card");

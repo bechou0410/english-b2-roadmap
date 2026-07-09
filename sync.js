@@ -128,6 +128,11 @@
        với các merger khác và tránh âm thầm nuốt kết quả tại chỗ bằng bản remote */
     return num(b.ts) > num(a.ts) ? b : a;
   }
+  /* ngày BẮT ĐẦU học: lấy mốc SỚM NHẤT giữa các thiết bị */
+  function mergeMinTs(a, b) {
+    if (!a) return b; if (!b) return a;
+    return num(a.ts) <= num(b.ts) ? a : b;
+  }
   function mergeMaxNum(a, b) { return Math.max(num(a), num(b)); }
 
   var MERGERS = {
@@ -139,6 +144,7 @@
     "b2-flashcards-custom-v1": mergeCustomCards,
     "b2-practice-v1": mergePractice,
     "b2-placement-v1": mergeByTs,
+    "b2-started-v1": mergeMinTs,
     "b2-progression-floor-v1": mergeMaxNum,
     "b2-flash-stage": mergeMaxNum,
   };
@@ -190,6 +196,16 @@
     reader.readAsText(file);
   }
 
+  /* ---------- xoá tiến độ ---------- */
+  function clearLocal() {
+    var del = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (k && k.indexOf("b2-") === 0) del.push(k); /* xoá mọi kho b2-*, kể cả meta/cache */
+    }
+    del.forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+  }
+
   /* ---------- Supabase ---------- */
   var sb = null, sbLoading = null;
   function loadSupabase() {
@@ -225,6 +241,16 @@
   function pushRemote(c, uid, stores) {
     return c.from("progress").upsert({ user_id: uid, data: stores, updated_at: new Date().toISOString() })
       .then(function (r) { if (r.error) throw r.error; });
+  }
+  function deleteRemote() {
+    return client().then(function (c) {
+      return c.auth.getUser().then(function (r) {
+        var u = r.data && r.data.user;
+        if (!u) return;
+        return c.from("progress").delete().eq("user_id", u.id)
+          .then(function (res) { if (res.error) throw res.error; });
+      });
+    });
   }
 
   var syncing = false, pending = false;
@@ -404,7 +430,8 @@
       '<button class="btn btn-ghost" data-act="export" type="button">' + ICONS.download + " Tải file sao lưu</button>" +
       '<button class="btn btn-ghost" data-act="import" type="button">' + ICONS.upload + " Khôi phục từ file</button>" +
       '<input type="file" accept="application/json,.json" hidden data-file>' +
-      "</div>"
+      "</div>" +
+      '<button class="sync-danger" data-act="wipe" type="button">🗑 Xoá tiến độ học</button>'
     );
   }
   function wireFileButtons() {
@@ -423,6 +450,22 @@
         setTimeout(function () { location.reload(); }, 800);
       });
       fileInput.value = "";
+    });
+    /* XOÁ TIẾN ĐỘ — thông minh theo trạng thái: đăng nhập thì xoá cả trên tài
+       khoản (remote) lẫn máy này; chưa đăng nhập thì chỉ xoá máy này */
+    body.querySelector('[data-act="wipe"]').addEventListener("click", function () {
+      var btn = this;
+      isLoggedIn().then(function (loggedIn) {
+        var scope = loggedIn ? "cả trên TÀI KHOẢN lẫn máy này" : "trên máy này";
+        if (!confirm("XOÁ toàn bộ tiến độ học (" + scope + "). KHÔNG khôi phục được.\n\nBạn chắc chắn?")) return;
+        btn.disabled = true; btn.textContent = "Đang xoá…";
+        var p = loggedIn ? deleteRemote() : Promise.resolve();
+        p.then(function () {
+          clearLocal();
+          toast("Đã xoá toàn bộ tiến độ.");
+          setTimeout(function () { location.reload(); }, 700);
+        }).catch(function (e) { btn.disabled = false; btn.textContent = "🗑 Xoá tiến độ học"; toast(authError(e), true); });
+      });
     });
   }
   function renderLoggedOut() {
@@ -494,10 +537,24 @@
         refreshBadge();
       }).catch(function (e) { btn.disabled = false; btn.innerHTML = ICONS.sync + " Đồng bộ ngay"; toast(authError(e), true); });
     });
+    /* ĐĂNG XUẤT: đồng bộ lần cuối → XOÁ localStorage khỏi máy này → đăng xuất.
+       Tránh "đăng xuất nhưng dữ liệu vẫn còn" trên máy chung. Chỉ xoá khi sync
+       thành công (dữ liệu đã an toàn trên tài khoản). */
     body.querySelector('[data-act="logout"]').addEventListener("click", function () {
-      client().then(function (cl) { return cl.auth.signOut(); }).then(function () {
-        toast("Đã đăng xuất (tiến trình vẫn còn trên máy này)."); renderModal(); refreshBadge();
-      });
+      if (!confirm("Đăng xuất sẽ đồng bộ lần cuối rồi XOÁ dữ liệu học khỏi máy này (dữ liệu vẫn an toàn trên tài khoản, đăng nhập lại là có).\n\nTiếp tục?")) return;
+      var btn = this; btn.disabled = true; btn.textContent = "Đang đăng xuất…";
+      fullSync({ reloadOnChange: false })
+        .then(function () { return client(); })
+        .then(function (cl) { return cl.auth.signOut(); })
+        .then(function () {
+          clearLocal();
+          toast("Đã đăng xuất & dọn dữ liệu khỏi máy này.");
+          setTimeout(function () { location.reload(); }, 700);
+        })
+        .catch(function (e) {
+          btn.disabled = false; btn.textContent = "Đăng xuất";
+          toast("Chưa đồng bộ được nên GIỮ nguyên dữ liệu để an toàn: " + authError(e), true);
+        });
     });
   }
   function authError(e) {

@@ -94,7 +94,14 @@
       });
   }
 
-  /* IPA + audio cho MỘT từ; trả null nếu không có (không phải lỗi) */
+  /* dịch nhãn loại từ sang tiếng Việt cho phần "cách dùng" */
+  var POS_VI = {
+    noun: "danh từ", verb: "động từ", adjective: "tính từ", adverb: "trạng từ",
+    pronoun: "đại từ", preposition: "giới từ", conjunction: "liên từ",
+    interjection: "thán từ", determiner: "từ hạn định", exclamation: "thán từ",
+  };
+
+  /* IPA + audio + CÁCH DÙNG cho MỘT từ (dictionaryapi.dev); null nếu không có */
   function fetchIpa(word) {
     return fetch("https://api.dictionaryapi.dev/api/v2/entries/en/" + encodeURIComponent(word.toLowerCase()))
       .then(function (r) { return r.ok ? r.json() : null; })
@@ -104,7 +111,15 @@
         var phonetics = e.phonetics || [];
         var ipa = e.phonetic || phonetics.map(function (p) { return p.text; }).filter(Boolean)[0] || null;
         var audio = phonetics.map(function (p) { return p.audio; }).filter(Boolean)[0] || null;
-        return ipa || audio ? { ipa: ipa, audio: audio } : null;
+        /* gom cách dùng: mỗi nhóm = loại từ + 1-2 định nghĩa + ví dụ (nếu có) */
+        var uses = [];
+        (e.meanings || []).forEach(function (m) {
+          var defs = (m.definitions || []).slice(0, 2).map(function (df) {
+            return { def: df.definition, example: df.example || null };
+          });
+          if (defs.length) uses.push({ pos: m.partOfSpeech, posVi: POS_VI[m.partOfSpeech] || m.partOfSpeech, defs: defs });
+        });
+        return ipa || audio || uses.length ? { ipa: ipa, audio: audio, uses: uses } : null;
       })
       .catch(function () { return null; });
   }
@@ -259,7 +274,7 @@
 
   /* cấu trúc popup dựng MỘT LẦN mỗi lượt mở; kết quả async chỉ cập nhật
      vùng body (aria-live) — không phá focus, screen reader đọc được kết quả */
-  var popBody = null, popIpa = null, popSrc = null, popState = null;
+  var popBody = null, popIpa = null, popSrc = null, popUses = null, popState = null;
   function buildPop(text) {
     pop.innerHTML =
       '<div class="lookup-head"><b class="lookup-term" lang="en">' + esc(text) + "</b>" +
@@ -271,10 +286,12 @@
       '<button class="lookup-say lookup-save" type="button" hidden>➕ Thẻ</button>' +
       "</div>" +
       '<div class="lookup-body" aria-live="polite"><p class="lookup-vi lookup-loading">Đang dịch…</p></div>' +
+      '<div class="lookup-uses" hidden></div>' +
       '<p class="lookup-src" hidden></p>';
     popBody = pop.querySelector(".lookup-body");
     popIpa = pop.querySelector(".lookup-ipa");
     popSrc = pop.querySelector(".lookup-src");
+    popUses = pop.querySelector(".lookup-uses");
     popState = { text: text, audio: null };
 
     pop.querySelector(".lookup-close").addEventListener("click", function () {
@@ -314,9 +331,45 @@
     placeAt(pop, anchor);
     pop.focus({ preventScroll: true });
 
+    /* phần "cách dùng": 1 gợi ý mặc định, bấm để xổ thêm */
+    function renderUses(uses) {
+      if (!uses || !uses.length) { popUses.hidden = true; return; }
+      var hintEx = null;
+      for (var i = 0; i < uses.length && !hintEx; i++) {
+        for (var j = 0; j < uses[i].defs.length; j++) {
+          if (uses[i].defs[j].example) { hintEx = { pos: uses[i].posVi, ex: uses[i].defs[j].example }; break; }
+        }
+      }
+      var first = uses[0], firstDef = first.defs[0];
+      var hint = hintEx
+        ? '<span class="use-pos">' + esc(hintEx.pos) + '</span> <span lang="en">“' + esc(hintEx.ex) + '”</span>'
+        : '<span class="use-pos">' + esc(first.posVi) + "</span> " + esc(firstDef.def);
+      var full = uses.map(function (u) {
+        return '<div class="use-block"><span class="use-pos">' + esc(u.posVi) + "</span><ul>" +
+          u.defs.map(function (df) {
+            return "<li>" + esc(df.def) + (df.example ? ' <span class="use-ex" lang="en">“' + esc(df.example) + '”</span>' : "") + "</li>";
+          }).join("") + "</ul></div>";
+      }).join("");
+      var hasMore = uses.length > 1 || first.defs.length > 1 || !hintEx;
+      popUses.innerHTML =
+        '<p class="use-label">Cách dùng</p><p class="use-hint">' + hint + "</p>" +
+        (hasMore ? '<button class="use-more" type="button" aria-expanded="false">▸ Xem thêm cách dùng</button><div class="use-full" hidden>' + full + "</div>" : "");
+      popUses.hidden = false;
+      var more = popUses.querySelector(".use-more");
+      if (more) more.addEventListener("click", function () {
+        var box = popUses.querySelector(".use-full");
+        var open = box.hidden;
+        box.hidden = !open;
+        more.setAttribute("aria-expanded", String(open));
+        more.textContent = open ? "▾ Thu gọn" : "▸ Xem thêm cách dùng";
+        placeAt(pop, anchor); /* đặt lại vị trí vì popup đổi kích thước */
+      });
+    }
+
     var render = function (result, ipa) {
       if (ipa && ipa.ipa) { popIpa.textContent = ipa.ipa; popIpa.hidden = false; }
       if (ipa && ipa.audio) popState.audio = ipa.audio;
+      if (ipa && ipa.uses) renderUses(ipa.uses);
       if (!result) {
         popBody.innerHTML = '<p class="lookup-vi lookup-error">Không dịch được — kiểm tra kết nối mạng rồi thử lại.</p>';
       } else {
@@ -348,7 +401,7 @@
 
     var cached = cacheGet(text.toLowerCase());
     if (cached) {
-      render({ vi: cached.vi, src: cached.src }, { ipa: cached.ipa, audio: cached.audio });
+      render({ vi: cached.vi, src: cached.src }, { ipa: cached.ipa, audio: cached.audio, uses: cached.uses });
       return;
     }
 
@@ -359,7 +412,7 @@
       var tr = res[0], ipa = res[1];
       /* cache kể cả khi popup đã đóng — lần tra sau khỏi gọi lại mạng */
       if (tr) {
-        cachePut(text.toLowerCase(), { vi: tr.vi, src: tr.src, ipa: ipa && ipa.ipa, audio: ipa && ipa.audio });
+        cachePut(text.toLowerCase(), { vi: tr.vi, src: tr.src, ipa: ipa && ipa.ipa, audio: ipa && ipa.audio, uses: ipa && ipa.uses });
       }
       if (pop.hidden || popState.text !== text) return;
       render(tr, ipa);

@@ -80,6 +80,11 @@
     var firstToday = !s.days[key];
     s.days[key] = true;
     saveJson(STREAK_KEY, s);
+    /* mốc BẮT ĐẦU học — ghi một lần vào bài đầu tiên, để bảng Thành tích đếm
+       "đã học bao nhiêu ngày" và ước lượng thời gian đạt B2 */
+    if (!loadJson("b2-started-v1")) {
+      try { localStorage.setItem("b2-started-v1", JSON.stringify({ ts: Date.now() })); } catch (e) {}
+    }
     renderStreak();
     if (firstToday) celebrate(); /* lần đầu trong ngày: thưởng ngay */
   }
@@ -354,6 +359,11 @@
       var btn = g.querySelector(".nav-group-btn");
       var drop = g.querySelector(".nav-drop");
       if (!btn || !drop) return;
+      /* tách "▾" thành caret có thể xoay (mũi tên accordion trên mobile) */
+      if (!btn.querySelector(".nav-caret")) {
+        btn.innerHTML = btn.textContent.replace(/\s*▾\s*$/, "").trim() +
+          ' <span class="nav-caret" aria-hidden="true">▾</span>';
+      }
       btn.addEventListener("click", function () {
         var open = drop.hidden;
         /* đóng các nhóm khác trước */

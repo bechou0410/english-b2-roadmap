@@ -1606,7 +1606,7 @@ a:hover { color: var(--accent-deep); }
 }
 
 /* lưới chủ đề flashcard */
-.topic-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.topic-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; max-height: 14.5rem; overflow-y: auto; overscroll-behavior: contain; padding: 2px; margin: -2px; }
 .topic-chip {
   font-family: var(--font-body);
   font-size: 0.9rem;

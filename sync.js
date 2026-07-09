@@ -287,6 +287,17 @@
   }
 
   /* ---------- giao diện: nút tài khoản + hộp thoại ---------- */
+  /* icon nét mảnh dùng currentColor — khớp phong cách line-icon của trang */
+  function svg(paths) {
+    return '<svg class="btn-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths + "</svg>";
+  }
+  var ICONS = {
+    sync: svg('<path d="M20 11a8 8 0 0 0-14-4.9L3 8"/><path d="M3 3v5h5"/><path d="M4 13a8 8 0 0 0 14 4.9L21 16"/><path d="M21 21v-5h-5"/>'),
+    download: svg('<path d="M12 3v11"/><path d="M8 10l4 4 4-4"/><path d="M5 20h14"/>'),
+    upload: svg('<path d="M12 21V10"/><path d="M8 14l4-4 4 4"/><path d="M5 4h14"/>'),
+    user: svg('<circle cx="12" cy="8" r="3.5"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/>'),
+  };
   var modal, statusEl, toastEl;
   function toast(msg, bad) {
     if (!toastEl) {
@@ -390,8 +401,8 @@
       '<p class="eyebrow">Sao lưu bằng file (không cần tài khoản)</p>' +
       '<p class="exercise-hint">Tải toàn bộ tiến trình thành 1 file, mở trên máy/điện thoại khác rồi Khôi phục. Khôi phục sẽ HỢP NHẤT, không xoá tiến độ đang có.</p>' +
       '<div class="result-actions">' +
-      '<button class="btn btn-ghost" data-act="export" type="button">⬇️ Tải file sao lưu</button>' +
-      '<button class="btn btn-ghost" data-act="import" type="button">⬆️ Khôi phục từ file</button>' +
+      '<button class="btn btn-ghost" data-act="export" type="button">' + ICONS.download + " Tải file sao lưu</button>" +
+      '<button class="btn btn-ghost" data-act="import" type="button">' + ICONS.upload + " Khôi phục từ file</button>" +
       '<input type="file" accept="application/json,.json" hidden data-file>' +
       "</div>"
     );
@@ -470,18 +481,18 @@
       '<p><b>' + esc(user.email) + "</b></p>" +
       '<p class="exercise-hint sync-last">' + esc(lastSyncText()) + "</p>" +
       '<div class="result-actions">' +
-      '<button class="btn btn-primary" data-act="syncnow" type="button">🔄 Đồng bộ ngay</button>' +
+      '<button class="btn btn-primary" data-act="syncnow" type="button">' + ICONS.sync + " Đồng bộ ngay</button>" +
       '<button class="btn btn-ghost" data-act="logout" type="button">Đăng xuất</button>' +
       "</div>";
     var body = modal.querySelector(".sync-cloud");
     body.querySelector('[data-act="syncnow"]').addEventListener("click", function () {
       var btn = this; btn.disabled = true; btn.textContent = "Đang đồng bộ…";
       fullSync({ reloadOnChange: true }).then(function (res) {
-        btn.disabled = false; btn.textContent = "🔄 Đồng bộ ngay";
+        btn.disabled = false; btn.innerHTML = ICONS.sync + " Đồng bộ ngay";
         body.querySelector(".sync-last").textContent = lastSyncText();
         toast(res.changedLocal ? "Đã đồng bộ (có cập nhật)." : "Đã đồng bộ.");
         refreshBadge();
-      }).catch(function (e) { btn.disabled = false; btn.textContent = "🔄 Đồng bộ ngay"; toast(authError(e), true); });
+      }).catch(function (e) { btn.disabled = false; btn.innerHTML = ICONS.sync + " Đồng bộ ngay"; toast(authError(e), true); });
     });
     body.querySelector('[data-act="logout"]').addEventListener("click", function () {
       client().then(function (cl) { return cl.auth.signOut(); }).then(function () {
@@ -507,7 +518,7 @@
     accountBtn.className = "account-btn";
     accountBtn.type = "button";
     accountBtn.setAttribute("aria-label", "Tài khoản và sao lưu");
-    accountBtn.innerHTML = '<span class="account-ico" aria-hidden="true">👤</span>';
+    accountBtn.innerHTML = ICONS.user;
     /* đặt trước vòng tiến độ / hamburger nếu có */
     var ring = header.querySelector(".header-progress");
     var toggle = header.querySelector(".nav-toggle");

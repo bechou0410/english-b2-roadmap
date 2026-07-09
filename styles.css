@@ -1888,6 +1888,10 @@ a.streak-chip:hover { border-color: var(--s3); color: var(--ink); }
   position: relative;
 }
 .account-btn:hover { border-color: var(--s3); }
+.account-btn svg { width: 20px; height: 20px; color: var(--ink); }
+.account-btn.is-in svg { color: var(--s4); }
+/* icon nét mảnh trong các nút của hộp thoại tài khoản */
+.btn-ico { width: 18px; height: 18px; flex: none; }
 .account-btn.is-in { border-color: var(--s3); background: color-mix(in srgb, var(--s2) 14%, var(--surface)); }
 .account-btn.is-in::after {
   content: "";

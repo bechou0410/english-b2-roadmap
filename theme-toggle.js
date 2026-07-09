@@ -7,7 +7,7 @@
   "use strict";
 
   var KEY = "b2-theme";
-  var META = { dark: "#0e1512", light: "#f2f5f0" }; /* khớp --bg mỗi theme */
+  var META = { dark: "#121212", light: "#f2f5f0" }; /* khớp --bg mỗi theme */
   var mq = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 
   function stored() {

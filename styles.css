@@ -50,17 +50,17 @@
 
 /* ---------- THEME TỐI ----------
    data-theme="dark" do script đặt trên <html> (theo lựa chọn đã lưu hoặc hệ
-   thống). Đảo bộ token: nền tối, chữ sáng, xanh/cam sáng hơn cho đủ tương phản.
-   Chữ dùng biến "-ink" (sáng); nền màu vẫn dùng token --s và --accent (đủ tối cho chữ trắng). */
+   thống). Nền/chữ/viền dùng XÁM TRUNG TÍNH (đen-xám, không ám xanh); chỉ giữ
+   cam (accent) và xanh chặng làm điểm nhấn thương hiệu. Chữ dùng biến "-ink". */
 :root[data-theme="dark"] {
-  --bg: #0e1512;
-  --surface: #16201b;
-  --surface-2: #1f2b25;
-  --ink: #e9efe9;
-  --ink-soft: #b0bfb5;
-  --ink-faint: #8fa096;
-  --line: #2c3a33;
-  --line-soft: #223029;
+  --bg: #121212;          /* đen trung tính */
+  --surface: #1e1e1e;     /* xám đậm (thẻ/panel) */
+  --surface-2: #2a2a2a;   /* xám nổi hơn (khối con) */
+  --ink: #ececec;
+  --ink-soft: #b2b2b2;
+  --ink-faint: #8b8b8b;
+  --line: #343434;
+  --line-soft: #272727;
 
   --accent: #e46a33;       /* CTA nền cam (chữ trắng, nút to/đậm) */
   --accent-deep: #c85426;  /* hover nút primary */
@@ -76,7 +76,7 @@
   --danger-bg: #351d17;
   --danger-line: #cf6a4a;
   --danger-solid: #b3441c;
-  --input-line: #71857a;
+  --input-line: #6a6a6a;
 }
 :root[data-theme="dark"] .score-banner.fail { border-color: var(--danger-line); }  /* #e5b8a5 sáng → dịu lại ở nền tối */
 :root[data-theme="dark"] .skill-switch button[aria-pressed="true"] { background: var(--s3); border-color: var(--s3); } /* --ink làm nền sẽ đảo sáng → dùng xanh cho pill đang chọn */

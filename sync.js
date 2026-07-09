@@ -9,7 +9,29 @@
   "use strict";
 
   var CFG = window.B2_SYNC || {};
-  var CLOUD = !!(CFG.supabaseUrl && CFG.supabaseKey);
+
+  /* CHỐT CHẶN: khoá phải là "anon" (JWT claim role). Nếu ai đó lỡ dán khoá
+     "service_role" (toàn quyền, bỏ qua RLS) vào file công khai → CHẶN, không
+     khởi tạo client, cảnh báo — biến sai lầm thảm hoạ thành lỗi bắt được. */
+  function keyRole(jwt) {
+    try {
+      var p = String(jwt).split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+      p += "===".slice((p.length + 3) % 4);
+      return JSON.parse(atob(p)).role;
+    } catch (e) { return null; }
+  }
+  var CONFIGURED = !!(CFG.supabaseUrl && CFG.supabaseKey);
+  var CLOUD = CONFIGURED;
+  if (CONFIGURED) {
+    var k = String(CFG.supabaseKey);
+    /* chặn khoá bí mật ở cả 2 định dạng: JWT role=service_role, và định dạng
+       mới sb_secret_... (đều toàn quyền, bỏ qua RLS — không được để ở client) */
+    if (keyRole(k) === "service_role" || /^sb_secret_/.test(k)) {
+      CLOUD = false;
+      console.error("[B2Sync] Khoá trong sync-config.js là khoá BÍ MẬT (service_role / sb_secret) — TUYỆT ĐỐI KHÔNG dùng ở client. Đã chặn. Hãy thay bằng khoá anon public / sb_publishable.");
+      window.__B2_KEY_DANGER = true;
+    }
+  }
   var META_KEY = "b2-sync-meta-v1";
   /* các kho KHÔNG đồng bộ: cache dịch (nặng, tái tạo được) + timer (tạm thời) */
   var SKIP = { "b2-dict-cache-v1": 1, "b2-timer-v1": 1, "b2-sync-meta-v1": 1 };
@@ -102,7 +124,9 @@
   }
   function mergeByTs(a, b) {
     if (!a) return b; if (!b) return a;
-    return num(b.ts) >= num(a.ts) ? b : a;
+    /* mới hơn thắng; hoà (kể cả cả hai thiếu ts, =0) thì GIỮ LOCAL — nhất quán
+       với các merger khác và tránh âm thầm nuốt kết quả tại chỗ bằng bản remote */
+    return num(b.ts) > num(a.ts) ? b : a;
   }
   function mergeMaxNum(a, b) { return Math.max(num(a), num(b)); }
 
@@ -127,7 +151,17 @@
     });
     return out;
   }
-  function sameJson(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+  /* stringify chuẩn hoá: sắp khoá để so sánh KHÔNG phụ thuộc thứ tự khoá
+     (merged dựng theo thứ tự chèn local, remote về theo thứ tự khác → tránh
+     coi là "đã đổi" rồi push thừa / reload giả) */
+  function stable(v) {
+    if (v === null || typeof v !== "object") return v;
+    if (Array.isArray(v)) return v.map(stable);
+    var o = {};
+    Object.keys(v).sort().forEach(function (k) { o[k] = stable(v[k]); });
+    return o;
+  }
+  function sameJson(a, b) { return JSON.stringify(stable(a)) === JSON.stringify(stable(b)); }
 
   /* ---------- sao lưu / khôi phục file ---------- */
   function exportFile() {
@@ -163,9 +197,13 @@
     if (sbLoading) return sbLoading;
     sbLoading = new Promise(function (res, rej) {
       var s = document.createElement("script");
-      s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+      /* PIN version chính xác + SRI: trình duyệt từ chối chạy nếu file CDN bị
+         đổi/hỏng (chống supply-chain trên trang xử lý email/mật khẩu/token) */
+      s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.1/dist/umd/supabase.min.js";
+      s.integrity = "sha384-fx4y4cDx8NYfissnVzdGJY3yVXWY3rn5ab5HTUjpvgT35oDiyAbjjqnLhnRmESNE";
+      s.crossOrigin = "anonymous";
       s.onload = res;
-      s.onerror = function () { rej(new Error("Không tải được thư viện Supabase — kiểm tra mạng.")); };
+      s.onerror = function () { rej(new Error("Không tải được thư viện Supabase — kiểm tra mạng hoặc bộ chặn quảng cáo.")); };
       document.head.appendChild(s);
     });
     return sbLoading;
@@ -254,8 +292,11 @@
     if (!toastEl) {
       toastEl = document.createElement("div");
       toastEl.className = "sync-toast";
+      toastEl.setAttribute("role", "status");
+      toastEl.setAttribute("aria-live", "polite");
       document.body.appendChild(toastEl);
     }
+    toastEl.setAttribute("role", bad ? "alert" : "status");
     toastEl.textContent = msg;
     toastEl.classList.toggle("is-bad", !!bad);
     toastEl.classList.add("is-show");
@@ -273,13 +314,38 @@
     return "";
   }
 
+  var modalTrigger = null;
+  function bgEls() {
+    return [document.querySelector(".site-header"), document.querySelector("main"), document.querySelector(".footer, .site-footer")]
+      .filter(Boolean);
+  }
   function openModal() {
     if (!modal) buildModal();
+    modalTrigger = document.activeElement && document.activeElement.focus ? document.activeElement : accountBtn;
     modal.hidden = false;
-    modal.querySelector(".sync-card").focus();
+    document.documentElement.classList.add("sync-lock"); /* khoá cuộn nền */
+    bgEls().forEach(function (el) { el.setAttribute("aria-hidden", "true"); });
     renderModal();
+    modal.querySelector(".sync-card").focus();
   }
-  function closeModal() { if (modal) modal.hidden = true; }
+  function closeModal() {
+    if (!modal || modal.hidden) return;
+    modal.hidden = true;
+    document.documentElement.classList.remove("sync-lock");
+    bgEls().forEach(function (el) { el.removeAttribute("aria-hidden"); });
+    if (modalTrigger && document.contains(modalTrigger)) modalTrigger.focus();
+    else if (accountBtn) accountBtn.focus();
+  }
+  /* bẫy Tab trong hộp thoại — không cho focus trốn ra header/nav phía sau */
+  function trapTab(e) {
+    if (e.key !== "Tab" || !modal || modal.hidden) return;
+    var f = modal.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+    f = Array.prototype.filter.call(f, function (el) { return el.offsetParent !== null || el === document.activeElement; });
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
 
   function buildModal() {
     modal = document.createElement("div");
@@ -293,6 +359,7 @@
       "</div>";
     document.body.appendChild(modal);
     modal.addEventListener("click", function (e) { if (e.target.hasAttribute("data-close")) closeModal(); });
+    modal.addEventListener("keydown", trapTab);
     document.addEventListener("keydown", function (e) { if (e.key === "Escape" && modal && !modal.hidden) closeModal(); });
   }
 
@@ -300,9 +367,11 @@
     var body = modal.querySelector(".sync-body");
     var cloudSection;
     if (!CLOUD) {
-      cloudSection =
-        '<p class="eyebrow">Đồng bộ đám mây</p>' +
-        '<p class="exercise-hint">Chưa bật. Người quản trị cần điền khoá Supabase trong <code>sync-config.js</code> (xem <code>docs/sync-setup.md</code>). Trong lúc đó bạn vẫn sao lưu/khôi phục bằng file bên dưới.</p>';
+      cloudSection = window.__B2_KEY_DANGER
+        ? '<p class="eyebrow">Đồng bộ đám mây</p>' +
+          '<p class="sync-msg"><b>⚠️ Khoá cấu hình sai (service_role) — đã chặn vì lý do an toàn.</b> Hãy thay bằng khoá <b>anon public</b> trong <code>sync-config.js</code>.</p>'
+        : '<p class="eyebrow">Đồng bộ đám mây</p>' +
+          '<p class="exercise-hint">Chưa bật. Người quản trị cần điền khoá Supabase trong <code>sync-config.js</code> (xem <code>SYNC-SETUP.md</code>). Trong lúc đó bạn vẫn sao lưu/khôi phục bằng file bên dưới.</p>';
       body.innerHTML = wrap(cloudSection);
       wireFileButtons();
       return;

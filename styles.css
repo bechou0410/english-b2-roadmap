@@ -1909,8 +1909,19 @@ a.streak-chip:hover { border-color: var(--s3); color: var(--ink); }
   width: min(460px, 100%);
   max-height: 90dvh;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
-.sync-x { position: absolute; top: 0.8rem; right: 0.9rem; }
+.sync-x {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.6rem;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+}
+html.sync-lock, html.sync-lock body { overflow: hidden; } /* khoá cuộn nền khi mở hộp thoại */
 .sync-form { display: grid; gap: 0.6rem; margin-top: 0.4rem; }
 .sync-input {
   width: 100%;

@@ -38,7 +38,7 @@
   var EPOCH_KEY = "b2-reset-epoch-v1";
   /* các kho KHÔNG đồng bộ: cache dịch (nặng, tái tạo được) + timer (tạm thời)
      + meta + thế hệ reset (chỉ có ý nghĩa cục bộ) */
-  var SKIP = { "b2-dict-cache-v1": 1, "b2-timer-v1": 1, "b2-sync-meta-v1": 1, "b2-reset-epoch-v1": 1 };
+  var SKIP = { "b2-dict-cache-v1": 1, "b2-timer-v1": 1, "b2-sync-meta-v1": 1, "b2-reset-epoch-v1": 1, "b2-theme": 1 };
 
   function isSyncKey(k) { return k && k.indexOf("b2-") === 0 && !SKIP[k]; }
 

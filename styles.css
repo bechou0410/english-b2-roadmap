@@ -46,6 +46,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 84px; }
 
 body {
   margin: 0;
+  position: relative; /* containing block cho lớp grain (::after absolute) */
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-body);
@@ -54,10 +55,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Grain nhẹ toàn trang — giấy bản đồ, không phẳng lì */
+/* Grain nhẹ toàn trang — giấy bản đồ, không phẳng lì.
+   Dùng position:absolute (KHÔNG fixed): iOS Safari (iOS 26+) lấy màu thanh
+   trạng thái từ phần tử FIXED sát mép trên; một lớp phủ fixed nhiễu-hạt z-index
+   cao ngay đỉnh màn hình làm status bar bị "hở"/nhòe khi cuộn. Absolute thì phủ
+   theo chiều cao tài liệu (cuộn cùng trang, nhìn y hệt) và không bị Safari lấy mẫu. */
 body::after {
   content: "";
-  position: fixed;
+  position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 999;

@@ -42,7 +42,9 @@
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+/* nền trên CẢ html: iOS Safari lộ canvas gốc (html) ở dải trên cùng khi cuộn
+   quá đà (overscroll) — không đặt thì hiện dải TRẮNG sát status bar. */
+html { scroll-behavior: smooth; scroll-padding-top: 84px; background: var(--bg); }
 
 body {
   margin: 0;

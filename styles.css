@@ -102,10 +102,22 @@ a:hover { color: var(--accent-deep); }
   position: sticky;
   top: 0;
   z-index: 50;
-  background: color-mix(in srgb, var(--bg) 86%, transparent);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  isolation: isolate; /* stacking context để ::before nền nằm sau nội dung header */
   border-bottom: 1px solid var(--line-soft);
+}
+/* Nền kính mờ đặt trên PSEUDO-ELEMENT, KHÔNG trên chính phần tử sticky. iOS
+   Safari (nhất là iOS 26) lấy màu thanh trạng thái từ background của phần tử
+   fixed/sticky sát mép trên; nếu header trong suốt + backdrop-filter thì màu
+   status bar bị "hở"/nhòe khi cuộn. Header không có background → Safari lấy nền
+   body (đặc #f2f5f0) cho status bar; kính mờ vẫn hiện nhờ ::before. */
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 .header-inner {
   display: flex;
@@ -920,9 +932,9 @@ a:hover { color: var(--accent-deep); }
   /* nút tài khoản chuyển vào trong menu trên mobile (đặc tả cao hơn base để
      thắng bất kể thứ tự nguồn) */
   .site-header .account-btn { display: none; }
-  /* Safari iOS: nền header trong suốt 86% làm nội dung cuộn lộ qua phía trên —
-     dùng nền ĐẶC trên mobile để bịt hẳn (blur không cần vì không còn xuyên thấu) */
-  .site-header { background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  /* Safari iOS: nền ĐẶC trên mobile (khớp màu status bar Safari lấy từ body),
+     bỏ blur vì không còn xuyên thấu — chặn hẳn "hở" mép trên khi cuộn */
+  .site-header::before { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
 
   .site-nav {
     position: absolute;

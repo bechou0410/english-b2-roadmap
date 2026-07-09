@@ -632,7 +632,9 @@
     function multiplier() { return 1 + Math.floor(combo / 3); }
     function updateHud() {
       hud.querySelector(".blitz-score").textContent = score;
-      hud.querySelector(".blitz-combo").textContent = combo >= 3 ? "🔥 combo ×" + multiplier() : "";
+      hud.querySelector(".blitz-combo").innerHTML = combo >= 3
+        ? '<svg class="streak-flame" viewBox="0 0 24 24" aria-hidden="true"><path class="flame-body" d="M12 2c-.5 3.2-2.3 5.3-4 7.2-1.5 1.7-2.8 3.5-2.8 5.9a6.8 6.8 0 0 0 13.6 0c0-2.9-1.6-5.4-3.6-7.7.1 1.3-.5 2.3-1.6 2.8C14.4 7.8 13.7 4.8 12 2z"/><path class="flame-core" d="M12 13.2c1.3 1.4 2.2 2.6 2.2 4a2.7 2.7 0 0 1-5.4 0c0-.9.4-1.7 1-2.4.2.6.7.9 1.4 1-.6-.9-.5-1.8.8-2.6z"/></svg> combo ×' + multiplier()
+        : "";
     }
 
     function showQuestion() {

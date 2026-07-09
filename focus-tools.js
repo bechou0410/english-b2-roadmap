@@ -53,8 +53,9 @@
     if (!streakChip) return;
     var n = currentStreak();
     streakChip.innerHTML =
-      '<svg class="streak-flame" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
-      '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> ' +
+      '<svg class="streak-flame" viewBox="0 0 24 24" aria-hidden="true">' +
+      '<path class="flame-body" d="M12 2c-.5 3.2-2.3 5.3-4 7.2-1.5 1.7-2.8 3.5-2.8 5.9a6.8 6.8 0 0 0 13.6 0c0-2.9-1.6-5.4-3.6-7.7.1 1.3-.5 2.3-1.6 2.8C14.4 7.8 13.7 4.8 12 2z"/>' +
+      '<path class="flame-core" d="M12 13.2c1.3 1.4 2.2 2.6 2.2 4a2.7 2.7 0 0 1-5.4 0c0-.9.4-1.7 1-2.4.2.6.7.9 1.4 1-.6-.9-.5-1.8.8-2.6z"/></svg> ' +
       n + ' <span class="streak-note">' +
       (todayDone() ? "· hôm nay ✓" : "ngày") + "</span>";
     streakChip.setAttribute("aria-label",

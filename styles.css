@@ -1377,8 +1377,10 @@ a:hover { color: var(--accent-deep); }
   white-space: nowrap;
 }
 .streak-chip .streak-note { font-weight: 500; color: var(--ink-faint); font-size: 0.72rem; }
-/* ngọn lửa chuỗi ngày — SVG thay emoji 🔥, tô màu accent, co giãn theo cỡ chữ */
-.streak-flame { width: 1em; height: 1em; color: var(--accent); vertical-align: -0.13em; flex: none; }
+/* ngọn lửa chuỗi ngày — SVG 2 tông thay emoji 🔥, co giãn theo cỡ chữ (1em) */
+.streak-flame { width: 1em; height: 1em; vertical-align: -0.13em; flex: none; }
+.streak-flame .flame-body { fill: var(--accent); }
+.streak-flame .flame-core { fill: color-mix(in srgb, var(--accent) 55%, #ffd68f); } /* lõi lửa ấm sáng */
 
 .confetti-box { position: fixed; inset: 0; pointer-events: none; z-index: 200; }
 .confetti-box i {

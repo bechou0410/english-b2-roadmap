@@ -1330,7 +1330,7 @@ window.IPA_METHOD = {
     },
     {
       "id": "thoi-quen-hoc-deu-moi-ngay",
-      "icon": "🔥",
+      "icon": "📅",
       "title_vi": "Học đều mỗi ngày: Thiết kế thói quen cho người hay mất tập trung",
       "summary_vi": "Vấn đề không phải bạn thiếu ý chí — mà là việc học được thiết kế quá khó để bắt đầu. Phiên ngắn, phần thưởng tức thì và giảm số quyết định phải đưa ra là ba đòn bẩy giúp người dễ xao nhãng (kể cả ADHD) học đều.",
       "sections": [

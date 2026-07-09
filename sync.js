@@ -373,6 +373,8 @@
     download: svg('<path d="M12 3v11"/><path d="M8 10l4 4 4-4"/><path d="M5 20h14"/>'),
     upload: svg('<path d="M12 21V10"/><path d="M8 14l4-4 4 4"/><path d="M5 4h14"/>'),
     user: svg('<circle cx="12" cy="8" r="3.5"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/>'),
+    cloud: svg('<path d="M17.5 19a4.5 4.5 0 0 0 .45-8.98 6 6 0 0 0-11.6-1.5A4 4 0 0 0 6.5 19z"/>'),
+    trash: svg('<path d="M4 7h16"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M6.5 7l.8 12a2 2 0 0 0 2 1.9h5.4a2 2 0 0 0 2-1.9l.8-12"/>'),
   };
   var modal, statusEl, toastEl;
   function toast(msg, bad) {
@@ -458,12 +460,12 @@
         ? '<p class="eyebrow">Đồng bộ đám mây</p>' +
           '<p class="sync-msg"><b>⚠️ Khoá cấu hình sai (service_role) — đã chặn vì lý do an toàn.</b> Hãy thay bằng khoá <b>anon public</b> trong <code>sync-config.js</code>.</p>'
         : '<p class="eyebrow">Đồng bộ đám mây</p>' +
-          '<p class="exercise-hint">Chưa bật. Người quản trị cần điền khoá Supabase trong <code>sync-config.js</code> (xem <code>SYNC-SETUP.md</code>). Trong lúc đó bạn vẫn sao lưu/khôi phục bằng file bên dưới.</p>';
+          '<p class="sync-note">Chưa bật. Người quản trị cần điền khoá Supabase trong <code>sync-config.js</code> (xem <code>SYNC-SETUP.md</code>). Trong lúc đó bạn vẫn sao lưu/khôi phục bằng file bên dưới.</p>';
       body.innerHTML = wrap(cloudSection);
       wireFileButtons();
       return;
     }
-    body.innerHTML = wrap('<p class="eyebrow">Tài khoản</p><p class="exercise-hint">Đang kiểm tra…</p>');
+    body.innerHTML = wrap('<p class="eyebrow">Tài khoản</p><p class="sync-note">Đang kiểm tra…</p>');
     wireFileButtons();
     currentUser().then(function (user) {
       if (user) renderLoggedIn(user); else renderLoggedOut();
@@ -471,17 +473,23 @@
   }
   function wrap(cloudHtml) {
     return (
-      '<h2 style="margin-top:0;">Tài khoản &amp; sao lưu</h2>' +
-      '<div class="sync-cloud">' + cloudHtml + "</div>" +
-      '<hr style="border:none;border-top:1px solid var(--line);margin:1.4rem 0;">' +
-      '<p class="eyebrow">Sao lưu bằng file (không cần tài khoản)</p>' +
-      '<p class="exercise-hint">Tải toàn bộ tiến trình thành 1 file, mở trên máy/điện thoại khác rồi Khôi phục. Khôi phục sẽ HỢP NHẤT, không xoá tiến độ đang có.</p>' +
-      '<div class="result-actions">' +
-      '<button class="btn btn-ghost" data-act="export" type="button">' + ICONS.download + " Tải file sao lưu</button>" +
-      '<button class="btn btn-ghost" data-act="import" type="button">' + ICONS.upload + " Khôi phục từ file</button>" +
-      '<input type="file" accept="application/json,.json" hidden data-file>' +
+      '<div class="sync-head">' +
+        '<span class="sync-head-ico">' + ICONS.cloud + "</span>" +
+        '<h2 class="sync-title">Tài khoản &amp; sao lưu</h2>' +
       "</div>" +
-      '<button class="sync-danger" data-act="wipe" type="button">🗑 Xoá tiến độ học</button>'
+      '<div class="sync-block sync-cloud">' + cloudHtml + "</div>" +
+      '<div class="sync-block">' +
+        '<p class="eyebrow">Sao lưu bằng file</p>' +
+        '<p class="sync-note">Tải toàn bộ tiến trình thành 1 file, mở trên máy/điện thoại khác rồi Khôi phục. Khôi phục sẽ <b>hợp nhất</b>, không xoá tiến độ đang có.</p>' +
+        '<div class="sync-actions">' +
+          '<button class="btn btn-ghost" data-act="export" type="button">' + ICONS.download + " Tải file</button>" +
+          '<button class="btn btn-ghost" data-act="import" type="button">' + ICONS.upload + " Khôi phục</button>" +
+          '<input type="file" accept="application/json,.json" hidden data-file>' +
+        "</div>" +
+      "</div>" +
+      '<div class="sync-danger-zone">' +
+        '<button class="sync-danger" data-act="wipe" type="button">' + ICONS.trash + " Xoá tiến độ học</button>" +
+      "</div>"
     );
   }
   function wireFileButtons() {
@@ -507,7 +515,7 @@
       var btn = this;
       if (btn.disabled) return;
       btn.disabled = true; /* KHOÁ NGAY (đồng bộ), trước khi await — chặn double-click sinh 2 lần xoá */
-      var reset = function () { btn.disabled = false; btn.textContent = "🗑 Xoá tiến độ học"; };
+      var reset = function () { btn.disabled = false; btn.innerHTML = ICONS.trash + " Xoá tiến độ học"; };
       loginState().then(function (state) {
         if (state === "unknown") {
           /* không chắc đang đăng nhập → KHÔNG xoá nửa vời: nếu chỉ xoá máy này mà
@@ -539,11 +547,12 @@
   }
   function renderLoggedOut() {
     modal.querySelector(".sync-cloud").innerHTML =
-      '<p class="eyebrow">Đăng nhập để đồng bộ đa thiết bị</p>' +
+      '<p class="eyebrow">Đồng bộ đa thiết bị</p>' +
+      '<p class="sync-note">Đăng nhập để lưu tiến trình lên tài khoản và học tiếp trên máy hay điện thoại khác.</p>' +
       '<div class="sync-form">' +
       '<input type="email" class="sync-input" data-email placeholder="Email" autocomplete="email">' +
       '<input type="password" class="sync-input" data-pass placeholder="Mật khẩu (≥ 6 ký tự)" autocomplete="current-password">' +
-      '<div class="result-actions">' +
+      '<div class="sync-actions">' +
       '<button class="btn btn-primary" data-act="login" type="button">Đăng nhập</button>' +
       '<button class="btn btn-ghost" data-act="register" type="button">Đăng ký</button>' +
       "</div>" +
@@ -588,11 +597,17 @@
     });
   }
   function renderLoggedIn(user) {
+    var initial = esc(String(user.email || "?").charAt(0).toUpperCase());
     modal.querySelector(".sync-cloud").innerHTML =
       '<p class="eyebrow">Đã đăng nhập</p>' +
-      '<p><b>' + esc(user.email) + "</b></p>" +
-      '<p class="exercise-hint sync-last">' + esc(lastSyncText()) + "</p>" +
-      '<div class="result-actions">' +
+      '<div class="sync-account">' +
+        '<span class="sync-avatar" aria-hidden="true">' + initial + "</span>" +
+        '<div class="sync-account-info">' +
+          '<b class="sync-email">' + esc(user.email) + "</b>" +
+          '<span class="sync-status"><span class="sync-dot" aria-hidden="true"></span><span class="sync-last">' + esc(lastSyncText()) + "</span></span>" +
+        "</div>" +
+      "</div>" +
+      '<div class="sync-actions">' +
       '<button class="btn btn-primary" data-act="syncnow" type="button">' + ICONS.sync + " Đồng bộ ngay</button>" +
       '<button class="btn btn-ghost" data-act="logout" type="button">Đăng xuất</button>' +
       "</div>";

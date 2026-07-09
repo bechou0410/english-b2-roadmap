@@ -1870,6 +1870,79 @@ a.streak-chip:hover { border-color: var(--s3); color: var(--ink); }
 .grev-sub { margin: 0.15rem 0 0; font-size: 0.9rem; color: var(--ink-soft); }
 .grev-bad { color: #9c3413; }
 
+/* ====== Tài khoản & đồng bộ ====== */
+.account-btn {
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 1.05rem;
+  padding: 0;
+  position: relative;
+}
+.account-btn:hover { border-color: var(--s3); }
+.account-btn.is-in { border-color: var(--s3); background: color-mix(in srgb, var(--s2) 14%, var(--surface)); }
+.account-btn.is-in::after {
+  content: "";
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--s3);
+  border: 1.5px solid var(--surface);
+}
+
+.sync-modal { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 1rem; }
+.sync-modal[hidden] { display: none; }
+.sync-backdrop { position: absolute; inset: 0; background: rgba(23, 40, 32, 0.4); backdrop-filter: blur(2px); }
+.sync-card {
+  position: relative;
+  width: min(460px, 100%);
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+.sync-x { position: absolute; top: 0.8rem; right: 0.9rem; }
+.sync-form { display: grid; gap: 0.6rem; margin-top: 0.4rem; }
+.sync-input {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 1rem; /* >=16px tránh iOS zoom */
+  color: var(--ink);
+  background: var(--bg);
+  border: 1.5px solid #74857a;
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.8rem;
+}
+.sync-input:focus { outline: none; border-color: var(--s3); }
+.sync-msg { margin: 0.2rem 0 0; font-size: 0.9rem; color: var(--accent-deep); min-height: 1.2em; }
+.sync-last { font-size: 0.85rem; }
+
+.sync-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translate(-50%, 20px);
+  background: var(--s4);
+  color: #fff;
+  padding: 0.7rem 1.2rem;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  box-shadow: 0 8px 24px rgba(23, 58, 45, 0.3);
+  z-index: 130;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.25s var(--ease-spring), opacity 0.2s;
+}
+.sync-toast.is-show { opacity: 1; transform: translate(-50%, 0); }
+.sync-toast.is-bad { background: #9c3413; }
+
 /* ====== Reduced motion ====== */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

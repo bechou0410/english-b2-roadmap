@@ -105,6 +105,7 @@
 
     save({
       date: new Date().toLocaleDateString("vi-VN"),
+      ts: Date.now(), /* để đồng bộ đa thiết bị chọn kết quả mới nhất */
       byLevel: r.byLevel,
       recommendStage: r.recommendStage,
       level: level,

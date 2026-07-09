@@ -165,9 +165,15 @@
     var srs = loadObj(SRS_KEY);
     var valid = {};
     allCards().forEach(function (c) { valid[c.id] = true; });
+    /* Nếu file thẻ theo CHỦ ĐỀ chưa tải được (TOPICS rỗng vì 404/chặn/cache lỗi),
+       ĐỪNG dọn các id "t:*" — chúng vắng chỉ vì thiếu dữ liệu, xoá đi là mất
+       tiến độ SRS vĩnh viễn. Chỉ dọn không gian id có nguồn dữ liệu chắc chắn. */
+    var topicsLoaded = TOPICS.length > 0;
     var dirty = false;
     Object.keys(srs).forEach(function (k) {
-      if (!valid[k]) { delete srs[k]; dirty = true; }
+      if (valid[k]) return;
+      if (!topicsLoaded && k.indexOf("t:") === 0) return; /* giữ tiến độ thẻ chủ đề khi thiếu dữ liệu */
+      delete srs[k]; dirty = true;
     });
     if (dirty) save(SRS_KEY, srs);
   }
@@ -268,8 +274,9 @@
         : '<p class="exercise-hint">Chưa có thẻ nào. Bôi đen một từ tiếng Anh bất kỳ trên trang, bấm 🔎 Dịch rồi bấm <b>➕ Thẻ</b> — từ đó sẽ vào đây và được xếp lịch ôn.</p>');
     if (list.length) {
       var ul = el("ul", "custom-card-list");
+      var srsAll = loadObj(SRS_KEY); /* đọc store MỘT lần — đừng parse lại cho mỗi thẻ */
       list.forEach(function (c, i) {
-        var srsState = loadObj(SRS_KEY)["cu:" + String(c.en).toLowerCase()];
+        var srsState = srsAll["cu:" + String(c.en).toLowerCase()];
         var li = el("li", null,
           '<span><b lang="en">' + esc(c.en) + "</b>" +
           (c.ipa ? ' <span class="lookup-ipa" style="display:inline;">' + esc(c.ipa) + "</span>" : "") +

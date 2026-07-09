@@ -325,6 +325,9 @@
   function openPopover(rect) {
     hideBtn();
     var text = currentText;
+    /* chốt NGỮ CẢNH lúc mở popup — không đọc biến toàn cục lúc bấm "Thẻ" (một
+       selection mới trên trang có thể đã đổi currentContext → lưu nhầm câu) */
+    var ctx = currentContext;
     var anchor = makeAnchor(rect);
     openedAt = Date.now();
     buildPop(text);
@@ -350,7 +353,11 @@
             return "<li>" + esc(df.def) + (df.example ? ' <span class="use-ex" lang="en">“' + esc(df.example) + '”</span>' : "") + "</li>";
           }).join("") + "</ul></div>";
       }).join("");
-      var hasMore = uses.length > 1 || first.defs.length > 1 || !hintEx;
+      /* Còn gì để "Xem thêm"? Nếu gợi ý đang hiện VÍ DỤ (hintEx) thì nghĩa tiếng
+         Anh vẫn chưa hiện → mở rộng để xem nghĩa; nếu gợi ý đang hiện NGHĨA thì
+         chỉ mở rộng khi thật sự có thêm (nhiều loại từ / nhiều nghĩa) */
+      var hasMore = uses.length > 1 || first.defs.length > 1 ||
+        (hintEx ? !!(firstDef && firstDef.def) : false);
       popUses.innerHTML =
         '<p class="use-label">Cách dùng</p><p class="use-hint">' + hint + "</p>" +
         (hasMore ? '<button class="use-more" type="button" aria-expanded="false">▸ Xem thêm cách dùng</button><div class="use-full" hidden>' + full + "</div>" : "");
@@ -388,7 +395,7 @@
               vi: result.vi,
               ipa: (ipa && ipa.ipa) || null,
               /* chính câu đang đọc làm ví dụ — nhớ theo ngữ cảnh tốt hơn nghĩa trần */
-              example_en: currentContext || "",
+              example_en: ctx || "",
               addedAt: Date.now(),
             });
             saveBtn.textContent = "✓ Đã lưu vào flashcard";

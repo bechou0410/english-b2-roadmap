@@ -33,8 +33,12 @@
     }
   }
   var META_KEY = "b2-sync-meta-v1";
-  /* các kho KHÔNG đồng bộ: cache dịch (nặng, tái tạo được) + timer (tạm thời) */
-  var SKIP = { "b2-dict-cache-v1": 1, "b2-timer-v1": 1, "b2-sync-meta-v1": 1 };
+  /* "thế hệ reset": tăng mỗi lần XOÁ tiến độ. Giữ RIÊNG máy này (không đồng bộ,
+     không bị clearLocal xoá) để mốc bắt đầu MỚI thắng mốc cũ còn sót khi hợp nhất. */
+  var EPOCH_KEY = "b2-reset-epoch-v1";
+  /* các kho KHÔNG đồng bộ: cache dịch (nặng, tái tạo được) + timer (tạm thời)
+     + meta + thế hệ reset (chỉ có ý nghĩa cục bộ) */
+  var SKIP = { "b2-dict-cache-v1": 1, "b2-timer-v1": 1, "b2-sync-meta-v1": 1, "b2-reset-epoch-v1": 1 };
 
   function isSyncKey(k) { return k && k.indexOf("b2-") === 0 && !SKIP[k]; }
 
@@ -128,9 +132,15 @@
        với các merger khác và tránh âm thầm nuốt kết quả tại chỗ bằng bản remote */
     return num(b.ts) > num(a.ts) ? b : a;
   }
-  /* ngày BẮT ĐẦU học: lấy mốc SỚM NHẤT giữa các thiết bị */
-  function mergeMinTs(a, b) {
+  /* ngày BẮT ĐẦU học: thế hệ reset CAO hơn thắng (sau khi XOÁ tiến độ, mốc mới
+     thắng mốc cũ còn sót ở thiết bị khác chưa đồng bộ); cùng thế hệ thì lấy mốc
+     SỚM NHẤT (đúng cho trường hợp thường: mốc bắt đầu thật giữa các thiết bị).
+     Đánh đổi có chủ đích: mô hình hợp nhất không-mất-dữ-liệu không thể "reset"
+     tuyệt đối một máy khi máy khác vẫn giữ bản cũ; thế hệ giải quyết mốc bắt đầu. */
+  function mergeStarted(a, b) {
     if (!a) return b; if (!b) return a;
+    var ga = num(a.gen), gb = num(b.gen);
+    if (ga !== gb) return ga > gb ? a : b;
     return num(a.ts) <= num(b.ts) ? a : b;
   }
   function mergeMaxNum(a, b) { return Math.max(num(a), num(b)); }
@@ -144,7 +154,7 @@
     "b2-flashcards-custom-v1": mergeCustomCards,
     "b2-practice-v1": mergePractice,
     "b2-placement-v1": mergeByTs,
-    "b2-started-v1": mergeMinTs,
+    "b2-started-v1": mergeStarted,
     "b2-progression-floor-v1": mergeMaxNum,
     "b2-flash-stage": mergeMaxNum,
   };
@@ -201,7 +211,9 @@
     var del = [];
     for (var i = 0; i < localStorage.length; i++) {
       var k = localStorage.key(i);
-      if (k && k.indexOf("b2-") === 0) del.push(k); /* xoá mọi kho b2-*, kể cả meta/cache */
+      /* xoá mọi kho b2-* (kể cả meta/cache), TRỪ thế hệ reset — nó phải sống qua
+         lần xoá để mốc bắt đầu mới thắng mốc cũ ở thiết bị khác */
+      if (k && k.indexOf("b2-") === 0 && k !== EPOCH_KEY) del.push(k);
     }
     del.forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
   }
@@ -253,12 +265,28 @@
     });
   }
 
-  var syncing = false, pending = false;
+  var syncing = false, pending = false, wiping = false, idleWaiters = [];
+  /* đặt cờ đang-sync + đánh thức những ai chờ "rảnh" khi sync kết thúc */
+  function setSyncing(v) {
+    syncing = v;
+    if (!v && idleWaiters.length) {
+      var w = idleWaiters; idleWaiters = [];
+      w.forEach(function (f) { try { f(); } catch (e) {} });
+    }
+  }
+  /* chờ fullSync đang chạy (nếu có) kết thúc — dùng trước khi xoá/đăng xuất */
+  function whenIdle() {
+    if (!syncing) return Promise.resolve();
+    return new Promise(function (res) { idleWaiters.push(res); });
+  }
   function fullSync(opts) {
     opts = opts || {};
     if (!CLOUD) return Promise.resolve({ skipped: true });
+    /* đang XOÁ tiến độ → KHÔNG đồng bộ (nếu không, một vòng sync xen giữa có thể
+       đẩy bản đầy đủ lên lại/tái tạo hàng remote vừa xoá → reload khôi phục lại) */
+    if (wiping) return Promise.resolve({ skipped: true });
     if (syncing) { pending = true; return Promise.resolve({ busy: true }); }
-    syncing = true;
+    setSyncing(true);
     var cRef;
     return client().then(function (c) { cRef = c; return c.auth.getUser(); })
       .then(function (r) {
@@ -266,6 +294,9 @@
         if (!user) throw new Error("Chưa đăng nhập.");
         var local = collectLocal();
         return pullRemote(cRef, user.id).then(function (remote) {
+          /* xoá tiến độ vừa bắt đầu trong lúc đang kéo remote → bỏ vòng này,
+             KHÔNG áp/không đẩy bản cũ (chặn cả vòng sync đã lỡ chạy trước khi xoá) */
+          if (wiping) return { changedLocal: false };
           var merged = mergeStores(local, remote || {});
           var changedLocal = !sameJson(merged, local);
           if (changedLocal) applyStores(merged);
@@ -278,12 +309,21 @@
         });
       })
       .then(function (res) {
-        syncing = false;
+        setSyncing(false);
         if (pending) { pending = false; scheduleSync(); }
         if (res.changedLocal && opts.reloadOnChange) location.reload();
         return res;
       })
-      .catch(function (e) { syncing = false; throw e; });
+      .catch(function (e) { setSyncing(false); throw e; });
+  }
+  /* đồng bộ DỨT ĐIỂM: nếu đang có vòng sync chạy dở ({busy}) thì đợi nó xong rồi
+     đẩy bản mới nhất — đảm bảo local đã lên tài khoản trước khi xoá/đăng xuất */
+  function idleSync(tries) {
+    tries = tries || 0;
+    return fullSync({ reloadOnChange: false }).then(function (res) {
+      if (res && res.busy && tries < 5) return whenIdle().then(function () { return idleSync(tries + 1); });
+      return res;
+    });
   }
 
   var syncTimer = null;
@@ -298,6 +338,16 @@
   function isLoggedIn() {
     if (!CLOUD) return Promise.resolve(false);
     return currentUser().then(function (u) { loggedInCache = !!u; return !!u; }).catch(function () { return false; });
+  }
+  /* trạng thái đăng nhập RÕ RÀNG cho thao tác PHÁ HUỶ: phân biệt "chắc chắn chưa
+     đăng nhập" (out) với "không xác định được" (unknown — lỗi mạng/thư viện) — KHÔNG
+     nhập nhèm hai cái làm một, vì thao tác xoá dựa vào đó để quyết định phạm vi. */
+  function loginState() {
+    if (!CLOUD) return Promise.resolve("out");
+    return client()
+      .then(function (c) { return c.auth.getUser(); })
+      .then(function (r) { if (r.error) throw r.error; return (r.data && r.data.user) ? "in" : "out"; })
+      .catch(function () { return "unknown"; });
   }
 
   /* ---------- theo dõi thay đổi để tự đẩy lên ---------- */
@@ -455,16 +505,35 @@
        khoản (remote) lẫn máy này; chưa đăng nhập thì chỉ xoá máy này */
     body.querySelector('[data-act="wipe"]').addEventListener("click", function () {
       var btn = this;
-      isLoggedIn().then(function (loggedIn) {
+      if (btn.disabled) return;
+      btn.disabled = true; /* KHOÁ NGAY (đồng bộ), trước khi await — chặn double-click sinh 2 lần xoá */
+      var reset = function () { btn.disabled = false; btn.textContent = "🗑 Xoá tiến độ học"; };
+      loginState().then(function (state) {
+        if (state === "unknown") {
+          /* không chắc đang đăng nhập → KHÔNG xoá nửa vời: nếu chỉ xoá máy này mà
+             remote còn nguyên thì lần đồng bộ sau (reload) sẽ kéo lại toàn bộ */
+          reset();
+          toast("Chưa kiểm tra được trạng thái đăng nhập (mạng?). Hãy thử lại.", true);
+          return;
+        }
+        var loggedIn = state === "in";
         var scope = loggedIn ? "cả trên TÀI KHOẢN lẫn máy này" : "trên máy này";
-        if (!confirm("XOÁ toàn bộ tiến độ học (" + scope + "). KHÔNG khôi phục được.\n\nBạn chắc chắn?")) return;
-        btn.disabled = true; btn.textContent = "Đang xoá…";
+        if (!confirm("XOÁ toàn bộ tiến độ học (" + scope + "). KHÔNG khôi phục được.\n\nBạn chắc chắn?")) { reset(); return; }
+        btn.textContent = "Đang xoá…";
+        wiping = true;             /* chặn mọi fullSync xen giữa (kể cả vòng đang chạy dở) */
+        clearTimeout(syncTimer);   /* huỷ scheduleSync đang chờ */
+        if (loggedIn) {
+          /* tăng thế hệ reset (sống qua clearLocal) để mốc bắt đầu MỚI sau này
+             thắng mốc cũ còn sót ở thiết bị khác khi hợp nhất */
+          try { localStorage.setItem(EPOCH_KEY, JSON.stringify(num(parse(localStorage.getItem(EPOCH_KEY))) + 1)); } catch (e) {}
+        }
         var p = loggedIn ? deleteRemote() : Promise.resolve();
         p.then(function () {
           clearLocal();
           toast("Đã xoá toàn bộ tiến độ.");
           setTimeout(function () { location.reload(); }, 700);
-        }).catch(function (e) { btn.disabled = false; btn.textContent = "🗑 Xoá tiến độ học"; toast(authError(e), true); });
+          /* GIỮ wiping=true tới lúc reload để không vòng sync nào chạy chen vào */
+        }).catch(function (e) { wiping = false; reset(); toast(authError(e), true); });
       });
     });
   }
@@ -541,9 +610,14 @@
        Tránh "đăng xuất nhưng dữ liệu vẫn còn" trên máy chung. Chỉ xoá khi sync
        thành công (dữ liệu đã an toàn trên tài khoản). */
     body.querySelector('[data-act="logout"]').addEventListener("click", function () {
+      var btn = this;
+      if (btn.disabled) return;
       if (!confirm("Đăng xuất sẽ đồng bộ lần cuối rồi XOÁ dữ liệu học khỏi máy này (dữ liệu vẫn an toàn trên tài khoản, đăng nhập lại là có).\n\nTiếp tục?")) return;
-      var btn = this; btn.disabled = true; btn.textContent = "Đang đăng xuất…";
-      fullSync({ reloadOnChange: false })
+      btn.disabled = true; btn.textContent = "Đang đăng xuất…";
+      clearTimeout(syncTimer); /* đừng để scheduleSync chen vào giữa */
+      /* idleSync: nếu vòng sync đầu trả {busy} (đang có sync chạy dở) thì đợi xong
+         rồi đẩy bản mới nhất — KHÔNG coi {busy} là "đã đồng bộ" rồi xoá mất dữ liệu chưa kịp đẩy */
+      idleSync()
         .then(function () { return client(); })
         .then(function (cl) { return cl.auth.signOut(); })
         .then(function () {

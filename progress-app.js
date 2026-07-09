@@ -35,6 +35,7 @@
     if (days < 70) return Math.round(days / 7) + " tuần";
     if (days < 365) return Math.round(days / 30) + " tháng";
     var y = Math.floor(days / 365), m = Math.round((days % 365) / 30);
+    if (m >= 12) { y += 1; m -= 12; } /* tháng làm tròn tràn 12 → cộng dồn sang năm (tránh "1 năm 12 tháng") */
     return y + " năm" + (m ? " " + m + " tháng" : "");
   }
 
@@ -122,7 +123,12 @@
   journey.style.marginTop = "1.2rem";
   if (started && started.ts) {
     var startDate = new Date(Number(started.ts));
-    var daysSince = Math.max(1, Math.floor((Date.now() - Number(started.ts)) / 86400000) + 1);
+    /* Đếm theo NGÀY-LỊCH (cùng đơn vị với totalDays) — nếu tính theo mili-giây
+       trôi qua thì "học thật" (đếm ngày) có thể lớn hơn "đã N ngày" khi bắc qua
+       nửa đêm, hiện ra câu vô lý "đã 1 ngày (học thật 2 ngày)". */
+    var startDay = new Date(startDate); startDay.setHours(0, 0, 0, 0);
+    var todayDay = new Date(); todayDay.setHours(0, 0, 0, 0);
+    var daysSince = Math.max(1, Math.round((todayDay - startDay) / 86400000) + 1, totalDays);
     /* mức hoàn thành tổng thể = 60% bài học + 40% test chặng */
     var completion = lessonsTotal
       ? (lessonsDone / lessonsTotal) * 0.6 + (testsPassed / 4) * 0.4

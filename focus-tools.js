@@ -81,9 +81,13 @@
     s.days[key] = true;
     saveJson(STREAK_KEY, s);
     /* mốc BẮT ĐẦU học — ghi một lần vào bài đầu tiên, để bảng Thành tích đếm
-       "đã học bao nhiêu ngày" và ước lượng thời gian đạt B2 */
+       "đã học bao nhiêu ngày" và ước lượng thời gian đạt B2. Gắn kèm "thế hệ
+       reset" (b2-reset-epoch-v1, do chức năng Xoá tiến độ tăng mỗi lần xoá) để
+       khi hợp nhất đa thiết bị, mốc bắt đầu MỚI thắng mốc cũ còn sót ở máy khác. */
     if (!loadJson("b2-started-v1")) {
-      try { localStorage.setItem("b2-started-v1", JSON.stringify({ ts: Date.now() })); } catch (e) {}
+      var gen = 0;
+      try { gen = Number(JSON.parse(localStorage.getItem("b2-reset-epoch-v1") || "0")) || 0; } catch (e) {}
+      try { localStorage.setItem("b2-started-v1", JSON.stringify({ ts: Date.now(), gen: gen })); } catch (e) {}
     }
     renderStreak();
     if (firstToday) celebrate(); /* lần đầu trong ngày: thưởng ngay */
@@ -402,15 +406,6 @@
     var header = document.querySelector(".site-header");
     var nav = document.querySelector(".site-nav");
     if (!header || !nav) return;
-
-    /* nhãn "Học tập" phía trên nhóm link (chỉ hiện trong panel mobile) */
-    var group = nav.querySelector(".nav-group");
-    if (group && !nav.querySelector(".nav-label-group")) {
-      var label = document.createElement("span");
-      label.className = "nav-label-group";
-      label.textContent = "Học tập";
-      group.insertBefore(label, group.firstChild);
-    }
 
     /* nút hamburger đặt cuối header-inner */
     var toggle = document.createElement("button");

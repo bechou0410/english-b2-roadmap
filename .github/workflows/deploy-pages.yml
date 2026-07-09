@@ -1,0 +1,33 @@
+name: Deploy to GitHub Pages
+
+# Triển khai trang tĩnh trực tiếp (không qua Jekyll) — nhanh hơn hẳn pipeline
+# "legacy". Mỗi lần push chỉ tải file lên rồi deploy, thường ~20-40s.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Push liên tiếp: huỷ lần deploy đang chạy dở, chỉ giữ lần mới nhất (không xếp hàng)
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4

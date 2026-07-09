@@ -254,13 +254,21 @@
     return c.from("progress").upsert({ user_id: uid, data: stores, updated_at: new Date().toISOString() })
       .then(function (r) { if (r.error) throw r.error; });
   }
+  /* "Xoá tiến độ trên tài khoản": GHI ĐÈ dữ liệu về RỖNG thay vì DELETE hàng.
+     Bảng progress chỉ có policy RLS select/insert/update — KHÔNG có delete, nên
+     .delete() bị RLS chặn ÂM THẦM (0 dòng, không báo lỗi) và tiến độ cũ bị kéo
+     lại khi tải lại trang. upsert data rỗng đi qua policy update/insert đã có,
+     BÁO lỗi nếu thất bại; kiểm lại remote để chắc chắn đã rỗng. */
   function deleteRemote() {
     return client().then(function (c) {
       return c.auth.getUser().then(function (r) {
         var u = r.data && r.data.user;
         if (!u) return;
-        return c.from("progress").delete().eq("user_id", u.id)
-          .then(function (res) { if (res.error) throw res.error; });
+        return pushRemote(c, u.id, {}).then(function () {
+          return pullRemote(c, u.id).then(function (remote) {
+            if (remote && Object.keys(remote).length) throw new Error("Xoá dữ liệu trên tài khoản chưa thành công — hãy thử lại.");
+          });
+        });
       });
     });
   }

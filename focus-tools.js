@@ -53,7 +53,9 @@
     if (!streakChip) return;
     var n = currentStreak();
     streakChip.innerHTML =
-      '<span aria-hidden="true">🔥</span> ' + n + ' <span class="streak-note">' +
+      '<svg class="streak-flame" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
+      '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> ' +
+      n + ' <span class="streak-note">' +
       (todayDone() ? "· hôm nay ✓" : "ngày") + "</span>";
     streakChip.setAttribute("aria-label",
       "Chuỗi " + n + " ngày học liên tiếp" + (todayDone() ? ", hôm nay đã học" : ", hôm nay chưa học") + " — mở trang thành tích");

@@ -1377,6 +1377,8 @@ a:hover { color: var(--accent-deep); }
   white-space: nowrap;
 }
 .streak-chip .streak-note { font-weight: 500; color: var(--ink-faint); font-size: 0.72rem; }
+/* ngọn lửa chuỗi ngày — SVG thay emoji 🔥, tô màu accent, co giãn theo cỡ chữ */
+.streak-flame { width: 1em; height: 1em; color: var(--accent); vertical-align: -0.13em; flex: none; }
 
 .confetti-box { position: fixed; inset: 0; pointer-events: none; z-index: 200; }
 .confetti-box i {

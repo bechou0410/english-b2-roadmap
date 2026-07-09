@@ -14,6 +14,6 @@
    Để trống hai giá trị này thì tính năng đám mây tự ẩn đi; nút "Sao lưu / khôi
    phục bằng file" vẫn dùng được mà không cần tài khoản. */
 window.B2_SYNC = {
-  supabaseUrl: "https://qlycqpjvwvlwlzqjbgku.supabase.co",
-  supabaseKey: "sb_publishable_ZMp6seD_BzYoSrwo3lmc8w_NE6aWRTz",
+  // supabaseUrl: "https://qlycqpjvwvlwlzqjbgku.supabase.co",
+  // supabaseKey: "sb_publishable_ZMp6seD_BzYoSrwo3lmc8w_NE6aWRTz",
 };

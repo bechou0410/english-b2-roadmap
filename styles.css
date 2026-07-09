@@ -188,6 +188,37 @@ a:hover { color: var(--accent-deep); }
 .nav-drop a:hover { background: var(--surface-2); border-bottom: none; }
 .nav-drop a[aria-current="page"] { color: var(--s4); font-weight: 600; }
 
+/* nút hamburger — chỉ hiện trên mobile (bật ở media query) */
+.nav-toggle {
+  display: none;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+}
+.nav-toggle span, .nav-toggle span::before, .nav-toggle span::after {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: transform 0.25s var(--ease-spring), opacity 0.2s;
+}
+.nav-toggle span { position: relative; }
+.nav-toggle span::before, .nav-toggle span::after { content: ""; position: absolute; left: 0; }
+.nav-toggle span::before { top: -6px; }
+.nav-toggle span::after { top: 6px; }
+.nav-toggle[aria-expanded="true"] span { background: transparent; }
+.nav-toggle[aria-expanded="true"] span::before { transform: translateY(6px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] span::after { transform: translateY(-6px) rotate(-45deg); }
+.nav-label-group { display: none; } /* nhãn "Học tập" trong panel mobile, ẩn trên desktop */
+
 .header-progress {
   position: relative;
   width: 40px;
@@ -881,13 +912,66 @@ a:hover { color: var(--accent-deep); }
 }
 
 @media (max-width: 680px) {
-  /* giữ điều hướng trên mobile: nav xuống hàng riêng, cuộn ngang được */
-  .header-inner { flex-wrap: wrap; row-gap: 0; padding-block: 0.55rem 0; }
+  /* MOBILE: hamburger mở panel dọc toàn chiều rộng dưới header */
+  .header-inner { gap: 0.6rem; }
   .brand { margin-right: auto; }
-  .site-nav { order: 3; flex-basis: 100%; margin-left: 0; padding-bottom: 0.55rem; overflow-x: auto; }
-  /* dropdown trong thanh cuộn ngang sẽ bị cắt → mở dạng inline trên mobile */
-  .nav-drop { position: static; transform: none; min-width: 0; flex-direction: row; gap: 0.2rem; border: none; box-shadow: none; padding: 0; background: none; }
-  .nav-drop a { white-space: nowrap; }
+  .nav-toggle { display: inline-flex; order: 5; }
+
+  .site-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin: 0;
+    padding: 0.5rem clamp(1.1rem, 4vw, 2rem) 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 12px 24px rgba(23, 58, 45, 0.12);
+    max-height: calc(100dvh - 64px);
+    overflow-y: auto;
+    /* ẩn mượt: gập lại khi chưa mở */
+    transform: translateY(-8px);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.22s var(--ease-spring), opacity 0.18s, visibility 0.18s;
+  }
+  .site-header.nav-open .site-nav { transform: none; opacity: 1; visibility: visible; }
+
+  .site-nav > a {
+    padding: 0.85rem 0.4rem;
+    font-size: 1.02rem;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .site-nav > a:hover { border-bottom-color: var(--line-soft); }
+
+  /* nhóm "Học tập" phẳng ra thành mục có nhãn, không cần bấm mở */
+  .nav-group { position: static; }
+  .nav-group-btn { display: none; }
+  .nav-label-group {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 0.9rem 0.4rem 0.3rem;
+  }
+  .nav-drop, .nav-drop[hidden] {
+    display: flex !important;
+    position: static;
+    transform: none;
+    min-width: 0;
+    flex-direction: column;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    background: none;
+  }
+  .nav-drop a { padding: 0.75rem 0.9rem; font-size: 1rem; border-bottom: 1px solid var(--line-soft); border-radius: 0; }
+
   .roadmap { padding-left: calc(clamp(1.1rem, 4vw, 2rem) + 46px); }
   .spine { left: calc(clamp(1.1rem, 4vw, 2rem) + 13px); }
   .stage-marker { left: -46px; width: 30px; height: 30px; font-size: 0.85rem; border-width: 3px; }

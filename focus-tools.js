@@ -387,10 +387,67 @@
     });
   }
 
+  /* ---------- menu hamburger cho mobile ---------- */
+  function setupMobileMenu() {
+    var header = document.querySelector(".site-header");
+    var nav = document.querySelector(".site-nav");
+    if (!header || !nav) return;
+
+    /* nhãn "Học tập" phía trên nhóm link (chỉ hiện trong panel mobile) */
+    var group = nav.querySelector(".nav-group");
+    if (group && !nav.querySelector(".nav-label-group")) {
+      var label = document.createElement("span");
+      label.className = "nav-label-group";
+      label.textContent = "Học tập";
+      group.insertBefore(label, group.firstChild);
+    }
+
+    /* nút hamburger đặt cuối header-inner */
+    var toggle = document.createElement("button");
+    toggle.className = "nav-toggle";
+    toggle.type = "button";
+    toggle.setAttribute("aria-label", "Mở menu");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-controls", nav.id || (nav.id = "site-nav"));
+    toggle.innerHTML = "<span></span>";
+    document.querySelector(".header-inner").appendChild(toggle);
+
+    function setOpen(open) {
+      header.classList.toggle("nav-open", open);
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.setAttribute("aria-label", open ? "Đóng menu" : "Mở menu");
+    }
+    toggle.addEventListener("click", function () {
+      setOpen(!header.classList.contains("nav-open"));
+    });
+    /* đóng khi bấm một link, bấm ra ngoài, hoặc Escape */
+    nav.addEventListener("click", function (e) {
+      if (e.target.closest("a")) setOpen(false);
+    });
+    document.addEventListener("click", function (e) {
+      if (header.classList.contains("nav-open") &&
+          !e.target.closest(".site-nav") && !e.target.closest(".nav-toggle")) {
+        setOpen(false);
+      }
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && header.classList.contains("nav-open")) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+    /* về desktop thì bỏ trạng thái mở để không kẹt */
+    var mq = window.matchMedia("(min-width: 681px)");
+    (mq.addEventListener ? mq.addEventListener.bind(mq, "change") : mq.addListener.bind(mq))(function () {
+      if (mq.matches) setOpen(false);
+    });
+  }
+
   injectStreakChip();
   buildTimerWidget();
   renderTodayCard();
   setupNavGroups();
+  setupMobileMenu();
 
   /* chuỗi/thẻ Hôm nay có thể đổi từ tab khác hoặc khi qua ngày mới —
      làm tươi khi tab được nhìn lại hoặc storage thay đổi */

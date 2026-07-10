@@ -38,6 +38,10 @@ jobs:
           cp .min/*.js .
           cp .min/styles.css .
           rm -rf .min
+      # Nhúng CSS vào <head> từng trang: bỏ nốt request stylesheet chặn render.
+      # Fail build nếu có trang không khớp, để không deploy trang mất CSS.
+      - name: Inline CSS into HTML
+        run: node .github/scripts/inline-css.js .
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

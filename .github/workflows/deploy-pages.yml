@@ -25,6 +25,19 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # Nén CSS/JS ngay trong artifact: file NGUỒN trong repo vẫn giữ nguyên để
+      # dễ đọc/sửa. --charset=utf8 là bắt buộc: mặc định esbuild escape ký tự
+      # tiếng Việt thành \uXXXX làm file PHÌNH TO thay vì nhỏ đi.
+      - name: Minify CSS & JS
+        run: |
+          npx -y esbuild@0.25.0 *.js --minify --charset=utf8 --outdir=.min --log-level=warning
+          npx -y esbuild@0.25.0 styles.css --minify --charset=utf8 --outdir=.min --log-level=warning
+          cp .min/*.js .
+          cp .min/styles.css .
+          rm -rf .min
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

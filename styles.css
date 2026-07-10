@@ -346,7 +346,11 @@ a:hover { color: var(--accent-ink); }
   display: grid;
   grid-template-columns: 1.08fr 0.92fr;
   gap: clamp(2rem, 5vw, 4rem);
-  align-items: center;
+  /* KHÔNG căn giữa theo trục dọc: khi webfont tải xong, h1 có thể ngắt dòng
+     khác (3↔4 dòng) làm cột chữ cao lên; căn giữa thì bản đồ bị đẩy xuống nửa
+     phần chênh → nội dung NHẢY (CLS "Web font loaded"). Neo trên + bù một
+     khoảng CỐ ĐỊNH: vị trí bản đồ không phụ thuộc chiều cao cột chữ nữa. */
+  align-items: start;
 }
 
 .hero h1 {
@@ -422,7 +426,7 @@ a:hover { color: var(--accent-ink); }
   white-space: nowrap;
 }
 
-.hero-map { min-width: 0; }
+.hero-map { min-width: 0; margin-top: clamp(0.5rem, 4.6vw, 4.5rem); }
 .hero-map svg { width: 100%; height: auto; display: block; }
 
 /* trail SVG (vẽ bởi app.js) */
@@ -985,7 +989,7 @@ a:hover { color: var(--accent-ink); }
 /* ====== Responsive ====== */
 @media (max-width: 900px) {
   .hero-grid { grid-template-columns: 1fr; }
-  .hero-map { max-width: 460px; margin-inline: auto; width: 100%; }
+  .hero-map { max-width: 460px; margin-inline: auto; width: 100%; margin-top: 0; } /* 1 cột: bỏ khoảng bù của bố cục 2 cột */
   .principles-grid { grid-template-columns: 1fr 1fr; }
   .principle, .principle:nth-child(6n + 1), .principle:nth-child(6n + 4), .principle:nth-child(6n + 5) { grid-column: span 1; }
   .placement-row { grid-template-columns: 1fr; gap: 0.7rem; padding: 1.3rem 0.2rem; }

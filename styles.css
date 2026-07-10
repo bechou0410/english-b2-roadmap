@@ -41,9 +41,9 @@
 
   --shadow-soft: 0 1px 2px rgba(23, 58, 45, 0.05), 0 10px 28px rgba(23, 58, 45, 0.07);
 
-  --font-display: "Bricolage Grotesque", "Be Vietnam Pro", system-ui, sans-serif;
-  --font-body: "Be Vietnam Pro", system-ui, -apple-system, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
+  --font-display: "Bricolage Grotesque", "Bricolage Fallback", "Be Vietnam Pro", system-ui, sans-serif;
+  --font-body: "Be Vietnam Pro", "BVP Fallback", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", "PlexMono Fallback", ui-monospace, "SF Mono", monospace;
 
   --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -80,6 +80,28 @@
 }
 :root[data-theme="dark"] .score-banner.fail { border-color: var(--danger-line); }  /* #e5b8a5 sáng → dịu lại ở nền tối */
 :root[data-theme="dark"] .skill-switch button[aria-pressed="true"] { background: var(--s3); border-color: var(--s3); } /* --ink làm nền sẽ đảo sáng → dùng xanh cho pill đang chọn */
+
+/* ---------- FONT DỰ PHÒNG KHỚP BỀ RỘNG ----------
+   Webfont tải BẤT ĐỒNG BỘ, nên trước khi tải xong trình duyệt vẽ bằng font dự
+   phòng. Nếu bề rộng chữ khác nhau, văn bản NGẮT DÒNG lại lúc webfont vào →
+   nội dung nhảy (Lighthouse CLS: "Web font loaded"). size-adjust dưới đây đo
+   bằng canvas: bề rộng webfont / bề rộng Arial ở cùng cỡ chữ, nên font dự
+   phòng chiếm đúng chỗ và không có dịch chuyển nào khi swap. */
+@font-face {
+  font-family: "BVP Fallback"; /* thay cho Be Vietnam Pro */
+  src: local("Arial"), local("Helvetica Neue"), local("Liberation Sans");
+  size-adjust: 108.5%;
+}
+@font-face {
+  font-family: "Bricolage Fallback"; /* thay cho Bricolage Grotesque */
+  src: local("Arial"), local("Helvetica Neue"), local("Liberation Sans");
+  size-adjust: 96.4%;
+}
+@font-face {
+  font-family: "PlexMono Fallback"; /* thay cho IBM Plex Mono */
+  src: local("Arial"), local("Helvetica Neue"), local("Liberation Sans");
+  size-adjust: 122.8%;
+}
 
 * { box-sizing: border-box; }
 

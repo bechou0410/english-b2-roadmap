@@ -85,79 +85,11 @@
     speechSynthesis.speak(u);
   }
 
-  /* ---------- so khớp từ (LCS) ---------- */
-  /* SpeechRecognition/người gõ hay trả về chữ số ("3") trong khi câu mẫu viết
-     bằng chữ ("three") — quy đổi để chấm công bằng */
-  var DIGIT_WORDS = {
-    "0": "zero", "1": "one", "2": "two", "3": "three", "4": "four",
-    "5": "five", "6": "six", "7": "seven", "8": "eight", "9": "nine",
-    "10": "ten", "11": "eleven", "12": "twelve", "20": "twenty",
-    "30": "thirty", "40": "forty", "50": "fifty", "100": "hundred",
-  };
-  function normWords(s) {
-    return String(s).toLowerCase()
-      .replace(/[’‘]/g, "'")
-      .replace(/[^a-z0-9' ]+/gi, " ")
-      .split(/\s+/).filter(Boolean)
-      .map(function (w) { return DIGIT_WORDS[w] || w; });
-  }
-  /* trả về Set các index từ trong target khớp được với got (theo thứ tự) */
-  function lcsMatch(target, got) {
-    var m = target.length, n = got.length;
-    var dp = [];
-    for (var i = 0; i <= m; i++) dp.push(new Array(n + 1).fill(0));
-    for (i = m - 1; i >= 0; i--)
-      for (var j = n - 1; j >= 0; j--)
-        dp[i][j] = target[i] === got[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
-    var matched = new Set();
-    i = 0; j = 0;
-    while (i < m && j < n) {
-      if (target[i] === got[j]) { matched.add(i); i++; j++; }
-      else if (dp[i + 1][j] >= dp[i][j + 1]) i++;
-      else j++;
-    }
-    return matched;
-  }
-  function compare(targetText, gotText) {
-    var target = normWords(targetText);
-    var got = normWords(gotText);
-    var matched = lcsMatch(target, got);
-    var pct = target.length ? Math.round((matched.size / target.length) * 100) : 0;
-    var diffHtml = target.map(function (w, i) {
-      return '<span class="' + (matched.has(i) ? "w-ok" : "w-miss") + '">' + esc(w) + "</span>";
-    }).join(" ");
-    var missed = target.filter(function (w, i) { return !matched.has(i); });
-    return { pct: pct, diffHtml: diffHtml, missed: missed };
-  }
-
-  /* ---------- phát hiện lỗi ngữ pháp trong bài viết ----------
-     "Gần đúng" mà thiếu/sai từ ngữ pháp (to be, trợ động từ, mạo từ, giới từ)
-     hoặc chia sai dạng từ (go/goes, watch/watched) là lỗi NGHIÊM TRỌNG —
-     không được tính đạt dù khớp 80-99% số từ. */
-  var GRAMMAR_WORDS = {};
-  ("am is are was were be been being do does did don't doesn't didn't have has had " +
-   "haven't hasn't hadn't will would won't wouldn't shall should can could may might must " +
-   "a an the to of in on at for with by from since until than as not no isn't aren't wasn't weren't")
-    .split(" ").forEach(function (w) { GRAMMAR_WORDS[w] = true; });
-  function stemWord(w) {
-    return w
-      .replace(/'(s|ll|re|ve|d|m|t)$/, "")
-      .replace(/(ies|ied|es|ed|ing|er|est|s)$/, "");
-  }
-  function grammarIssues(missed, userWords) {
-    var issues = [];
-    missed.forEach(function (w) {
-      if (GRAMMAR_WORDS[w]) {
-        issues.push("thiếu/sai từ ngữ pháp “" + w + "”");
-        return;
-      }
-      var st = stemWord(w);
-      if (st.length < 3) return;
-      var wrongForm = userWords.find(function (u) { return u !== w && stemWord(u) === st; });
-      if (wrongForm) issues.push("chia sai dạng: bạn viết “" + wrongForm + "”, cần “" + w + "”");
-    });
-    return issues;
-  }
+  /* ---------- so khớp từ + chấm ngữ pháp ----------
+     Dùng chung từ translate-grade.js (window.TranslateGrade) — cùng một bộ chấm
+     với câu dịch trong bài học, tránh lệch tiêu chí giữa hai nơi. */
+  var TG = window.TranslateGrade;
+  var normWords = TG.normWords, compare = TG.compare, grammarIssues = TG.grammarIssues;
 
   /* badge % tốt nhất trên card bài đã làm */
   function bestBadge(text, pass) {

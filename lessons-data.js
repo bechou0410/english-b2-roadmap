@@ -98,26 +98,23 @@ window.LESSONS = [
             "explain_vi": "Tiếng Anh nói tuổi bằng to be, không dùng have/has (\"has twelve years old\" là lỗi dịch từng chữ). My brother = he nên dùng is."
           },
           {
-            "question": "Tom ___ a doctor. He is a teacher.",
-            "options": [
-              "aren't",
-              "isn't",
-              "not is",
-              "don't"
+            "type": "translate",
+            "prompt_vi": "Tôi là giáo viên.",
+            "answers": [
+              "I am a teacher.",
+              "I'm a teacher."
             ],
-            "answer": 1,
-            "explain_vi": "Phủ định của is là isn't (is + not đứng SAU to be). \"Not is\" sai trật tự từ; \"aren't\" dùng cho số nhiều; \"don't\" chỉ đi với động từ thường, không đi với to be."
+            "note_vi": "Chủ ngữ \"I\" luôn đi với \"am\", có thể rút gọn thành \"I'm\"; nhớ có mạo từ \"a\" trước nghề nghiệp."
           },
           {
-            "question": "___ you from Vietnam? — Yes, I am.",
-            "options": [
-              "Is",
-              "Do",
-              "Are",
-              "Am"
+            "type": "translate",
+            "prompt_vi": "Cô ấy không phải là bác sĩ.",
+            "answers": [
+              "She is not a doctor.",
+              "She isn't a doctor.",
+              "She's not a doctor."
             ],
-            "answer": 2,
-            "explain_vi": "Câu hỏi với to be chỉ cần đảo to be lên đầu câu; you đi với are. \"Do\" không dùng khi câu đã có to be — đây là lỗi trộn hai loại câu hỏi rất phổ biến."
+            "note_vi": "Với \"she\" dùng \"is\"; câu phủ định thêm \"not\", rút gọn thành \"isn't\" hoặc \"she's not\"."
           }
         ]
       },
@@ -231,26 +228,23 @@ window.LESSONS = [
             "explain_vi": "Chủ ngữ số nhiều (2 người) → động từ giữ nguyên mẫu: live. \"Lives\" chỉ dùng cho số ít; \"are live\" trộn to be với động từ thường — lỗi rất phổ biến."
           },
           {
-            "question": "My father ___ meat. He only eats vegetables.",
-            "options": [
-              "don't eat",
-              "doesn't eats",
-              "doesn't eat",
-              "not eats"
+            "type": "translate",
+            "prompt_vi": "Anh ấy học tiếng Anh mỗi ngày.",
+            "answers": [
+              "He studies English every day.",
+              "Every day, he studies English.",
+              "Every day he studies English."
             ],
-            "answer": 2,
-            "explain_vi": "Ngôi 3 số ít phủ định: doesn't + V nguyên mẫu. \"Doesn't eats\" sai vì sau doesn't phải bỏ s; \"don't\" dùng cho I/you/we/they; \"not eats\" thiếu trợ động từ."
+            "note_vi": "Chủ ngữ ngôi ba số ít (he) nên động từ phải thêm -es, và \"study\" đổi \"y\" thành \"ies\" -> \"studies\"."
           },
           {
-            "question": "___ Yuki speak Vietnamese?",
-            "options": [
-              "Do",
-              "Is",
-              "Are",
-              "Does"
+            "type": "translate",
+            "prompt_vi": "Cô ấy không uống cà phê.",
+            "answers": [
+              "She doesn't drink coffee.",
+              "She does not drink coffee."
             ],
-            "answer": 3,
-            "explain_vi": "Câu có động từ thường \"speak\" nên hỏi bằng do/does; Yuki là 1 người → Does. \"Is/Are\" chỉ dùng khi câu có to be; \"Do\" dùng cho chủ ngữ số nhiều hoặc I/you."
+            "note_vi": "Câu phủ định ngôi ba số ít dùng \"doesn't/does not\" rồi để động từ chính ở dạng nguyên mẫu (drink), không thêm -s."
           }
         ]
       },
@@ -338,26 +332,22 @@ window.LESSONS = [
             "explain_vi": "\"Usually\" → hiện tại đơn (Sarah là ngôi 3 nên drinks); \"today\" + hành động khác thường lệ đang diễn ra → is drinking. Các đáp án khác đảo ngược hoặc dùng sai một trong hai thì."
           },
           {
-            "question": "He ___ TV at the moment.",
-            "options": [
-              "watch",
-              "watches",
-              "watching",
-              "is watching"
+            "type": "translate",
+            "prompt_vi": "Cô ấy đang làm bánh.",
+            "answers": [
+              "She is making a cake.",
+              "She's making a cake."
             ],
-            "answer": 3,
-            "explain_vi": "\"At the moment\" → hiện tại tiếp diễn: is watching. \"Watching\" thiếu is; \"watches\" là hiện tại đơn; \"watch\" vừa sai thì vừa thiếu s."
+            "note_vi": "Hành động đang diễn ra → dùng is + V-ing. Động từ tận cùng bằng 'e' câm thì bỏ 'e' rồi thêm -ing: make → making."
           },
           {
-            "question": "___ your sister studying for the exam now?",
-            "options": [
-              "Does",
-              "Do",
-              "Is",
-              "Are"
+            "type": "translate",
+            "prompt_vi": "Tôi đang uống cà phê ngay lúc này.",
+            "answers": [
+              "I am drinking coffee right now.",
+              "I'm drinking coffee right now."
             ],
-            "answer": 2,
-            "explain_vi": "Câu đã có V-ing (studying) nên là câu hỏi tiếp diễn → đảo to be lên đầu; your sister = she → Is. \"Does/Do\" chỉ dùng cho câu hỏi hiện tại đơn với động từ nguyên mẫu."
+            "note_vi": "Có 'ngay lúc này' báo hiệu hiện tại tiếp diễn: dùng am + V-ing chứ không phải hiện tại đơn."
           }
         ]
       },
@@ -449,26 +439,22 @@ window.LESSONS = [
             "explain_vi": "Hỏi nghề nghiệp dùng mẫu \"What does + S + do?\". Your sister là ngôi 3 số ít → does. Nhiều bạn nhầm dùng \"What is your sister do?\" — sai vì đã có động từ thường do thì không dùng is."
           },
           {
-            "question": "Do you like pho? — Yes, ___.",
-            "options": [
-              "I like",
-              "I am",
-              "you do",
-              "I do"
+            "type": "translate",
+            "prompt_vi": "Bạn có một chiếc xe hơi không?",
+            "answers": [
+              "Do you have a car?",
+              "Have you got a car?"
             ],
-            "answer": 3,
-            "explain_vi": "Trả lời ngắn lặp lại trợ động từ của câu hỏi: Do → Yes, I do. \"I like\" thiếu tân ngữ, không phải dạng trả lời ngắn; \"I am\" dùng cho câu hỏi to be; \"you do\" sai ngôi vì người trả lời nói về chính mình."
+            "note_vi": "Câu hỏi Yes/No ở hiện tại đơn bắt đầu bằng Do/Does, rồi chủ ngữ, rồi động từ nguyên mẫu: 'Do you have...?'. Tiếng Anh-Anh còn dùng cấu trúc 'Have you got...?' với nghĩa tương đương."
           },
           {
-            "question": "___ is your English class? — At 7 p.m.",
-            "options": [
-              "Where",
-              "When",
-              "What",
-              "Why"
+            "type": "translate",
+            "prompt_vi": "Người phụ nữ kia là ai?",
+            "answers": [
+              "Who is that woman?",
+              "Who's that woman?"
             ],
-            "answer": 1,
-            "explain_vi": "Câu trả lời \"At 7 p.m.\" là thời gian → hỏi bằng When. Where hỏi nơi chốn, What hỏi sự vật, Why hỏi lý do."
+            "note_vi": "Câu hỏi Wh- theo trật tự: từ để hỏi đứng đầu, rồi đến động từ to be, rồi chủ ngữ. Who's là dạng rút gọn của Who is."
           }
         ]
       },
@@ -574,26 +560,22 @@ window.LESSONS = [
             "explain_vi": "Nói nghề nghiệp số ít BẮT BUỘC có mạo từ, và engineer bắt đầu bằng âm nguyên âm /e/ → an. Bỏ mạo từ (\"is engineer\") là lỗi người Việt hay mắc vì tiếng Việt không có mạo từ."
           },
           {
-            "question": "___ shoes over there are my brother's.",
-            "options": [
-              "This",
-              "That",
-              "These",
-              "Those"
+            "type": "translate",
+            "prompt_vi": "Cô ấy là một bác sĩ.",
+            "answers": [
+              "She is a doctor.",
+              "She's a doctor."
             ],
-            "answer": 3,
-            "explain_vi": "\"Over there\" = ở đằng kia (xa) và shoes là số nhiều → Those. This/That dùng cho số ít; These dùng cho vật ở gần."
+            "note_vi": "Dùng mạo từ \"a\" trước danh từ đếm được số ít bắt đầu bằng âm phụ âm như \"doctor\"."
           },
           {
-            "question": "Two ___ stop near my house every morning.",
-            "options": [
-              "bus",
-              "buses",
-              "buss",
-              "bus's"
+            "type": "translate",
+            "prompt_vi": "Những đứa trẻ này rất vui.",
+            "answers": [
+              "These children are very happy.",
+              "These kids are very happy."
             ],
-            "answer": 1,
-            "explain_vi": "Danh từ tận cùng bằng s → thêm -es: buses. \"Buss\" sai chính tả; \"bus's\" là dạng sở hữu, không phải số nhiều; \"bus\" số ít không hợp với \"two\"."
+            "note_vi": "\"Child\" có dạng số nhiều bất quy tắc là \"children\", và danh từ số nhiều ở gần dùng \"these\"."
           }
         ]
       },
@@ -685,26 +667,22 @@ window.LESSONS = [
             "explain_vi": "Con của chú/bác là anh chị em HỌ → cousin. \"Brother\" là anh em ruột; \"nephew\" là cháu trai (con của anh chị em mình); \"grandson\" là cháu nội/ngoại."
           },
           {
-            "question": "We visit ___ grandparents every weekend.",
-            "options": [
-              "us",
-              "ours",
-              "our",
-              "we"
+            "type": "translate",
+            "prompt_vi": "Tên cô ấy là Lan.",
+            "answers": [
+              "Her name is Lan.",
+              "Her name's Lan."
             ],
-            "answer": 2,
-            "explain_vi": "Trước danh từ grandparents cần tính từ sở hữu → our. \"Us\" là tân ngữ, \"we\" là chủ ngữ, \"ours\" là đại từ sở hữu đứng một mình, không đi kèm danh từ."
+            "note_vi": "Với \"cô ấy\", dùng tính từ sở hữu \"her\" đứng trước danh từ: her name."
           },
           {
-            "question": "Tom and Mary have a son. ___ son is five years old.",
-            "options": [
-              "Their",
-              "There",
-              "His",
-              "They"
+            "type": "translate",
+            "prompt_vi": "Đây là xe đạp của Nam.",
+            "answers": [
+              "This is Nam's bike.",
+              "This is Nam's bicycle."
             ],
-            "answer": 0,
-            "explain_vi": "Tom and Mary = họ → their (của họ). \"There\" (ở đó) đồng âm với their nên rất dễ viết nhầm; \"His\" chỉ của một người nam; \"They\" là đại từ chủ ngữ, không đứng trước danh từ."
+            "note_vi": "Sở hữu của người: thêm \"'s\" vào tên riêng, ví dụ Nam's bike."
           }
         ]
       }
@@ -1211,26 +1189,23 @@ window.LESSONS = [
             "explain_vi": "Câu hỏi quá khứ đơn với động từ thường dùng 'Did + S + V'. 'Do' là hiện tại; 'Were' chỉ dùng với to be; 'Have you watch' sai cấu trúc và không hợp với mốc 'last night'."
           },
           {
-            "question": "Sarah ___ a new phone two weeks ago.",
-            "options": [
-              "buys",
-              "buyed",
-              "buy",
-              "bought"
+            "type": "translate",
+            "prompt_vi": "Tháng trước Minh đi Đà Lạt.",
+            "answers": [
+              "Minh went to Da Lat last month.",
+              "Last month Minh went to Da Lat.",
+              "Minh went to Dalat last month."
             ],
-            "answer": 3,
-            "explain_vi": "'Two weeks ago' → quá khứ đơn; 'buy' bất quy tắc nên quá khứ là 'bought'. 'Buyed' là lỗi thêm -ed sai; 'buys' là hiện tại; 'buy' chưa chia."
+            "note_vi": "Động từ bất quy tắc: 'go' đổi thành 'went' ở quá khứ, không thêm -ed."
           },
           {
-            "question": "We ___ at home last weekend because it rained all day.",
-            "options": [
-              "stay",
-              "stayed",
-              "staied",
-              "were stay"
+            "type": "translate",
+            "prompt_vi": "Tối qua Nam nấu bữa tối.",
+            "answers": [
+              "Nam cooked dinner last night.",
+              "Last night Nam cooked dinner."
             ],
-            "answer": 1,
-            "explain_vi": "'Stay' tận cùng là nguyên âm + y nên chỉ thêm -ed: stayed. 'Staied' đổi y thành i sai quy tắc; 'were stay' là lỗi thừa to be trước động từ thường; 'stay' chưa chia quá khứ."
+            "note_vi": "Động từ có quy tắc: thêm -ed vào 'cook' thành 'cooked' cho thì quá khứ đơn."
           }
         ]
       },
@@ -1322,26 +1297,22 @@ window.LESSONS = [
             "explain_vi": "Dự đoán dựa trên dấu hiệu nhìn thấy (mây đen) → be going to. 'Will to' sai cấu trúc (will + V, không có to); 'is rain' và 'goes to rain' không phải cấu trúc tương lai."
           },
           {
-            "question": "Don't worry, I ___ tell anyone your secret.",
-            "options": [
-              "don't",
-              "won't",
-              "am not",
-              "not will"
+            "type": "translate",
+            "prompt_vi": "Tôi hứa tôi sẽ gọi cho bạn tối nay.",
+            "answers": [
+              "I promise I will call you tonight.",
+              "I promise I'll call you tonight."
             ],
-            "answer": 1,
-            "explain_vi": "Lời hứa về tương lai → will; phủ định là won't (= will not). 'Don't tell' là hiện tại đơn; 'am not tell' sai cấu trúc; 'not will' sai trật tự từ."
+            "note_vi": "Dùng 'will' cho lời hứa; có thể rút gọn thành 'I'll'."
           },
           {
-            "question": "I think our team ___ the game tonight.",
-            "options": [
-              "wins",
-              "is winning",
-              "will win",
-              "won"
+            "type": "translate",
+            "prompt_vi": "Cô ấy định mua một chiếc laptop mới.",
+            "answers": [
+              "She is going to buy a new laptop.",
+              "She's going to buy a new laptop."
             ],
-            "answer": 2,
-            "explain_vi": "Dự đoán theo ý kiến cá nhân (I think) → will win. 'Wins' là hiện tại đơn; 'is winning' diễn tả đang diễn ra; 'won' là quá khứ, mâu thuẫn với 'tonight'."
+            "note_vi": "Kế hoạch đã định dùng 'be going to' và nhớ giữ 'to' trước động từ."
           }
         ]
       },
@@ -1447,26 +1418,22 @@ window.LESSONS = [
             "explain_vi": "So sánh nhất của 'good' là bất quy tắc: the best. 'Better' là so sánh hơn, không hợp với 'in our town'; 'the most good' và 'goodest' đều là dạng không tồn tại."
           },
           {
-            "question": "My new job is ___ than my old one.",
-            "options": [
-              "interestinger",
-              "more interesting",
-              "most interesting",
-              "the more interesting"
+            "type": "translate",
+            "prompt_vi": "Hôm nay tôi cảm thấy khỏe hơn.",
+            "answers": [
+              "I feel better today.",
+              "Today I feel better."
             ],
-            "answer": 1,
-            "explain_vi": "'Interesting' là tính từ dài → more interesting than. 'Interestinger' sai vì tính từ dài không thêm -er; 'most interesting' là so sánh nhất; 'the more interesting' thừa 'the' trong so sánh hơn."
+            "note_vi": "'good/well' có dạng so sánh hơn bất quy tắc là 'better' — đừng thêm -er hay nói 'gooder'."
           },
           {
-            "question": "Minh is ___ student in the class.",
-            "options": [
-              "the tallest",
-              "the most tall",
-              "taller",
-              "tallest"
+            "type": "translate",
+            "prompt_vi": "Nam là học sinh cao nhất lớp.",
+            "answers": [
+              "Nam is the tallest student in the class.",
+              "Nam is the tallest in the class."
             ],
-            "answer": 0,
-            "explain_vi": "So sánh nhất tính từ ngắn: the + tall + -est = the tallest. 'Tallest' thiếu 'the' — lỗi rất hay gặp; 'the most tall' sai vì tall là tính từ ngắn; 'taller' là so sánh hơn, cần 'than'."
+            "note_vi": "So sánh nhất với tính từ ngắn: dùng 'the' + tính từ + '-est' (tall → the tallest). Nói 'in the class' (trong lớp) chứ đừng bỏ 'the' thành 'in class' vì nghĩa sẽ thành 'trong giờ học'."
           }
         ]
       },
@@ -1568,26 +1535,22 @@ window.LESSONS = [
             "explain_vi": "'Never' = chưa bao giờ, khớp với vế sau 'muốn đi một ngày nào đó'. 'Just' và 'already' nghĩa là đã đi rồi, mâu thuẫn với câu; 'ever' không đứng trong câu khẳng định thế này."
           },
           {
-            "question": "Tom ___ his keys, so he can't open the door now.",
-            "options": [
-              "lose",
-              "losed",
-              "has lost",
-              "was lost"
+            "type": "translate",
+            "prompt_vi": "Bạn đã bao giờ đến Nhật Bản chưa?",
+            "answers": [
+              "Have you ever been to Japan?",
+              "Have you ever visited Japan?"
             ],
-            "answer": 2,
-            "explain_vi": "Kết quả còn ảnh hưởng đến hiện tại (giờ không mở được cửa) → hiện tại hoàn thành: has lost. 'Lose' chưa chia; 'losed' là dạng không tồn tại (lose bất quy tắc: lost); 'was lost' nghĩa là 'bị lạc', sai nghĩa."
+            "note_vi": "Hỏi về trải nghiệm dùng mẫu \"Have you ever + động từ phân từ (V3)?\"; \"đã đến một nơi\" dịch là \"been to\"."
           },
           {
-            "question": "We ___ that movie last Sunday.",
-            "options": [
-              "have seen",
-              "have saw",
-              "see",
-              "saw"
+            "type": "translate",
+            "prompt_vi": "Tôi đã làm xong bài tập rồi.",
+            "answers": [
+              "I have already done my homework.",
+              "I've already done my homework."
             ],
-            "answer": 3,
-            "explain_vi": "Có thời điểm xác định 'last Sunday' → phải dùng quá khứ đơn 'saw', không dùng hiện tại hoàn thành. 'Have seen' sai vì đã có mốc thời gian; 'have saw' sai dạng V3; 'see' là hiện tại."
+            "note_vi": "Thì hiện tại hoàn thành \"have + V3\"; \"already\" (đã... rồi) đặt giữa \"have\" và động từ phân từ."
           }
         ]
       },
@@ -1683,26 +1646,23 @@ window.LESSONS = [
             "explain_vi": "ON + bề mặt: bức tranh treo trên bề mặt tường → on the wall. 'In the wall' nghĩa là nằm bên trong bức tường; 'at' và 'over' không dùng cho vật gắn trên bề mặt."
           },
           {
-            "question": "I usually get up early ___ the morning.",
-            "options": [
-              "in",
-              "on",
-              "at",
-              "for"
+            "type": "translate",
+            "prompt_vi": "Lớp học bắt đầu lúc tám giờ.",
+            "answers": [
+              "The class starts at eight o'clock.",
+              "The class starts at eight.",
+              "The class begins at eight o'clock."
             ],
-            "answer": 0,
-            "explain_vi": "Buổi trong ngày dùng IN: in the morning/afternoon/evening. Lưu ý ngoại lệ 'at night'. 'At the morning' là lỗi phổ biến; 'on' chỉ dùng khi có thứ đi kèm (on Monday morning)."
+            "note_vi": "Giờ giấc cụ thể luôn đi với 'at': at eight o'clock."
           },
           {
-            "question": "Lan is waiting for you ___ the bus stop.",
-            "options": [
-              "in",
-              "at",
-              "on",
-              "to"
+            "type": "translate",
+            "prompt_vi": "Có một bức tranh trên tường.",
+            "answers": [
+              "There is a picture on the wall.",
+              "There's a picture on the wall."
             ],
-            "answer": 1,
-            "explain_vi": "AT + điểm cụ thể: at the bus stop. 'In' dùng cho không gian bao quanh, 'on' cho bề mặt; 'to' chỉ hướng chuyển động, không dùng để chỉ vị trí đứng đợi."
+            "note_vi": "Bề mặt như tường, bàn thì dùng 'on': on the wall."
           }
         ]
       },
@@ -1798,26 +1758,26 @@ window.LESSONS = [
             "explain_vi": "Mẫu hỏi đường chuẩn: 'How do I get to + nơi chốn?'. 'Arrive to' sai giới từ (arrive at/in); 'go for' và 'come at' không dùng để hỏi đường."
           },
           {
-            "question": "After the meal: \"Excuse me, can we have ___ , please?\"",
-            "options": [
-              "the money",
-              "a pay",
-              "the cost",
-              "the bill"
+            "type": "translate",
+            "prompt_vi": "Cái áo phông này bao nhiêu tiền?",
+            "answers": [
+              "How much is this T-shirt?",
+              "How much does this T-shirt cost?",
+              "How much is this T-shirt",
+              "How much does this T-shirt cost"
             ],
-            "answer": 3,
-            "explain_vi": "'The bill' (Anh-Anh) hoặc 'the check' (Anh-Mỹ) = hóa đơn tính tiền. 'The money' nghĩa là xin tiền; 'a pay' và 'the cost' không dùng trong tình huống này."
+            "note_vi": "Hỏi giá dùng mẫu 'How much is + đồ vật?'; danh từ số ít đi với 'is'. Có thể nói 'How much does + đồ vật + cost?'."
           },
           {
-            "question": "\"Go straight and turn right. The bank is ___ the post office.\"",
-            "options": [
-              "next to",
-              "next with",
-              "beside to",
-              "in next"
+            "type": "translate",
+            "prompt_vi": "Cho tôi một bát phở bò.",
+            "answers": [
+              "I'd like a bowl of beef pho, please.",
+              "I would like a bowl of beef pho, please.",
+              "I'd like a bowl of beef pho",
+              "I would like a bowl of beef pho"
             ],
-            "answer": 0,
-            "explain_vi": "'Next to + danh từ' = bên cạnh. 'Beside' cũng đúng nghĩa nhưng không đi với 'to'; 'next with' và 'in next' là các dạng không tồn tại."
+            "note_vi": "Gọi món lịch sự dùng 'I'd like + món' (I'd = I would), thêm 'please' ở cuối cho lịch sự."
           }
         ]
       }
@@ -2315,26 +2275,25 @@ window.LESSONS = [
             "explain_vi": "'since' + mốc thời gian (since 2021 = từ năm 2021 đến nay). 'for' phải đi với khoảng thời gian (for four years); 'in 2021' chỉ mốc thời gian cụ thể trong quá khứ nên không đi với hiện tại hoàn thành (muốn dùng 'in' phải chuyển về quá khứ đơn: 'Minh worked... in 2021'); 'from' cần cặp 'from... to...'. Đây là cặp since/for người Việt hay nhầm nhất."
           },
           {
-            "question": "___ you ever ___ sushi?",
-            "options": [
-              "Did … try",
-              "Do … try",
-              "Have … try",
-              "Have … tried"
+            "type": "translate",
+            "prompt_vi": "Tôi đã đến Đà Nẵng ba lần.",
+            "answers": [
+              "I have visited Da Nang three times.",
+              "I've visited Da Nang three times.",
+              "I have been to Da Nang three times.",
+              "I've been to Da Nang three times."
             ],
-            "answer": 3,
-            "explain_vi": "Hỏi về trải nghiệm với 'ever' → hiện tại hoàn thành: Have + S + ever + V3 (tried). 'Have … try' quên chia V3 — lỗi rất phổ biến; 'Did/Do … try' không đi với 'ever' khi hỏi kinh nghiệm sống."
+            "note_vi": "Trải nghiệm tính đến hiện tại, không nêu mốc thời gian cụ thể nên dùng hiện tại hoàn thành: have/has + V3."
           },
           {
-            "question": "Emma ___ to Vietnam three times, and she wants to come back again.",
-            "options": [
-              "went",
-              "has been",
-              "has gone",
-              "was going"
+            "type": "translate",
+            "prompt_vi": "Chúng tôi đi vịnh Hạ Long mùa hè năm ngoái.",
+            "answers": [
+              "We went to Ha Long Bay last summer.",
+              "We visited Ha Long Bay last summer.",
+              "We went to Halong Bay last summer."
             ],
-            "answer": 1,
-            "explain_vi": "Kinh nghiệm tính đến hiện tại ('three times' + vẫn muốn quay lại) → hiện tại hoàn thành. 'has been to' = đã từng đến và đã về, đúng nghĩa ở đây; 'has gone to' nghĩa là đang ở đó chưa về; 'went'/'was going' thiếu sự liên hệ với hiện tại."
+            "note_vi": "Có mốc thời gian xác định trong quá khứ (mùa hè năm ngoái) nên dùng quá khứ đơn, không dùng hiện tại hoàn thành."
           }
         ]
       },
@@ -2426,26 +2385,26 @@ window.LESSONS = [
             "explain_vi": "Mệnh đề if chia hiện tại đơn ('rains') → điều kiện loại 1, mệnh đề chính dùng 'will cancel'. 'would cancel' thuộc loại 2 nên lệch thì; 'cancel' và 'cancelled' thiếu 'will' để diễn tả kết quả tương lai."
           },
           {
-            "question": "If Yuki ___ in Vietnam, she would visit Hoi An every month.",
-            "options": [
-              "lives",
-              "lived",
-              "will live",
-              "has lived"
+            "type": "translate",
+            "prompt_vi": "Nếu trời mưa, tôi sẽ ở nhà.",
+            "answers": [
+              "If it rains, I will stay at home.",
+              "If it rains, I'll stay at home.",
+              "I will stay at home if it rains.",
+              "I'll stay at home if it rains."
             ],
-            "answer": 1,
-            "explain_vi": "Vế sau có 'would visit' → điều kiện loại 2 (giả định: thực tế Yuki không sống ở Việt Nam), mệnh đề if chia quá khứ đơn 'lived'. 'lives' thuộc loại 1, lệch với 'would'; 'will live' và 'has lived' không bao giờ đứng trong mệnh đề if loại 2."
+            "note_vi": "Điều kiện loại 1 (việc có thể xảy ra): mệnh đề \"if\" dùng hiện tại đơn (rains), mệnh đề chính dùng \"will + động từ nguyên mẫu\"."
           },
           {
-            "question": "What ___ if you won the lottery?",
-            "options": [
-              "would you do",
-              "will you do",
-              "do you do",
-              "did you do"
+            "type": "translate",
+            "prompt_vi": "Nếu tôi giàu, tôi sẽ mua một ngôi nhà lớn.",
+            "answers": [
+              "If I were rich, I would buy a big house.",
+              "If I were rich, I'd buy a big house.",
+              "I would buy a big house if I were rich.",
+              "I'd buy a big house if I were rich."
             ],
-            "answer": 0,
-            "explain_vi": "'won' (quá khứ đơn) trong mệnh đề if báo hiệu điều kiện loại 2 → vế hỏi dùng 'would you do'. 'will you do' thuộc loại 1, lệch thì; 'do you do' và 'did you do' không diễn tả kết quả giả định."
+            "note_vi": "Điều kiện loại 2 (giả định trái thực tế): mệnh đề \"if\" chia quá khứ và luôn dùng \"were\" cho mọi chủ ngữ, mệnh đề chính dùng \"would + động từ nguyên mẫu\"."
           }
         ]
       },
@@ -2541,26 +2500,22 @@ window.LESSONS = [
             "explain_vi": "'in 1975' → quá khứ đơn, chủ ngữ số nhiều 'these photos' → were + V3 (taken). 'took' là chủ động; 'are taken' sai thì; 'have taken' vừa chủ động vừa không đi được với mốc thời gian cụ thể."
           },
           {
-            "question": "The email has already ___ to all the students.",
-            "options": [
-              "been sent",
-              "sent",
-              "being sent",
-              "be sent"
+            "type": "translate",
+            "prompt_vi": "Văn phòng được dọn dẹp mỗi tối.",
+            "answers": [
+              "The office is cleaned every evening.",
+              "The office is cleaned each evening."
             ],
-            "answer": 0,
-            "explain_vi": "Bị động hiện tại hoàn thành: has/have + been + V3 → 'has been sent'. 'sent' thiếu 'been' — lỗi quên be rất hay gặp; 'being sent' dùng cho thì tiếp diễn; 'be sent' chỉ đứng sau will/can/must."
+            "note_vi": "Bị động hiện tại đơn: dùng is/are + quá khứ phân từ (V3); 'được dọn' thành is cleaned."
           },
           {
-            "question": "My motorbike ___ last night, so I have to take the bus today.",
-            "options": [
-              "stole",
-              "was stealing",
-              "was stolen",
-              "is stolen"
+            "type": "translate",
+            "prompt_vi": "Chiếc xe đạp của tôi bị lấy trộm.",
+            "answers": [
+              "My bike was stolen.",
+              "My bicycle was stolen."
             ],
-            "answer": 2,
-            "explain_vi": "Xe máy 'bị lấy trộm' vào tối qua → bị động quá khứ đơn: was + V3 (stolen). 'stole' là chủ động (xe không tự trộm); 'was stealing' là tiếp diễn chủ động; 'is stolen' sai thì vì có 'last night'."
+            "note_vi": "Bị động quá khứ đơn: dùng was/were + V3; 'bị lấy trộm' thành was stolen, không cần 'by'."
           }
         ]
       },
@@ -2652,26 +2607,22 @@ window.LESSONS = [
             "explain_vi": "'the photos' là vật, chỗ trống làm tân ngữ cho 'took' → dùng 'which' (hoặc 'that'). 'who' chỉ người; 'where'/'when' chỉ nơi chốn và thời gian, nhưng ở đây 'took' còn thiếu tân ngữ nên phải dùng đại từ quan hệ chỉ vật."
           },
           {
-            "question": "Is this the restaurant ___ serves the best pho in town?",
-            "options": [
-              "where",
-              "who",
-              "that",
-              "what"
+            "type": "translate",
+            "prompt_vi": "Người đàn ông làm việc ở đây rất tốt bụng.",
+            "answers": [
+              "The man who works here is very kind.",
+              "The man that works here is very kind."
             ],
-            "answer": 2,
-            "explain_vi": "Mệnh đề sau chỗ trống thiếu chủ ngữ ('serves...') → cần that/which làm chủ ngữ, đáp án là 'that'. Nhiều người Việt chọn 'where' vì thấy 'restaurant' là nơi chốn, nhưng 'where' phải đi với mệnh đề đủ chủ-vị; 'who' chỉ người; 'what' không phải đại từ quan hệ."
+            "note_vi": "Dùng 'who' (hoặc 'that') để nối mệnh đề chỉ người; động từ chia theo danh từ đứng trước ('works'). Ở đây đại từ quan hệ làm chủ ngữ của mệnh đề nên không được bỏ."
           },
           {
-            "question": "Da Lat is a city ___ many tourists visit in spring.",
-            "options": [
-              "where",
-              "which",
-              "who",
-              "when"
+            "type": "translate",
+            "prompt_vi": "Đây là ngôi nhà nơi tôi lớn lên.",
+            "answers": [
+              "This is the house where I grew up.",
+              "This is the house I grew up in."
             ],
-            "answer": 1,
-            "explain_vi": "'visit' thiếu tân ngữ (visit cái gì?) → chỗ trống phải là đại từ quan hệ chỉ vật làm tân ngữ: 'which'. Bẫy nằm ở 'where': tuy Đà Lạt là nơi chốn nhưng 'where' chỉ đứng trước mệnh đề đầy đủ; 'who' chỉ người; 'when' chỉ thời gian."
+            "note_vi": "Dùng 'where' cho mệnh đề chỉ nơi chốn; sau 'where' đã đủ chủ-vị nên không cần thêm giới từ. Cách khác: bỏ đại từ quan hệ và đưa giới từ 'in' ra cuối câu ('the house I grew up in')."
           }
         ]
       },
@@ -2763,26 +2714,22 @@ window.LESSONS = [
             "explain_vi": "Câu hỏi tường thuật dùng trật tự câu trần thuật (S + V) và lùi thì: are going → was going, you → I. 'was I going' giữ trật tự đảo của câu hỏi — lỗi kinh điển; 'am I going' và 'I am going' quên lùi thì."
           },
           {
-            "question": "'Don't touch the wire,' the electrician said. → The electrician told us ___ the wire.",
-            "options": [
-              "don't touch",
-              "to not touching",
-              "not touch",
-              "not to touch"
+            "type": "translate",
+            "prompt_vi": "Lan nói rằng cô ấy mệt.",
+            "answers": [
+              "Lan said that she was tired.",
+              "Lan said she was tired."
             ],
-            "answer": 3,
-            "explain_vi": "Tường thuật câu mệnh lệnh phủ định: told + tân ngữ + not to V → 'not to touch'. 'don't touch' giữ nguyên lời nói trực tiếp; 'to not touching' sai dạng động từ; 'not touch' thiếu 'to'."
+            "note_vi": "Khi tường thuật với 'said', nhớ lùi thì: am/is chuyển thành was."
           },
           {
-            "question": "'Have you finished the report?' the manager asked. → The manager asked Lan ___ the report.",
-            "options": [
-              "if she had finished",
-              "if she has finished",
-              "did she finish",
-              "that she finished"
+            "type": "translate",
+            "prompt_vi": "Cô ấy hỏi tôi sống ở đâu.",
+            "answers": [
+              "She asked me where I lived.",
+              "She asked where I lived."
             ],
-            "answer": 0,
-            "explain_vi": "Câu hỏi Yes/No tường thuật bằng 'if/whether' + S + V, và hiện tại hoàn thành lùi thành quá khứ hoàn thành → 'if she had finished'. 'if she has finished' quên lùi thì; 'did she finish' giữ trật tự câu hỏi; 'that' không dùng cho câu hỏi Yes/No."
+            "note_vi": "Tường thuật câu hỏi: giữ từ để hỏi, bỏ trợ động từ 'do', dùng trật tự S + V và lùi thì (live thành lived)."
           }
         ]
       },
@@ -2878,26 +2825,23 @@ window.LESSONS = [
             "explain_vi": "Sau chỗ trống là mệnh đề đầy đủ 'he felt sick' → dùng 'because'. 'because of' chỉ đứng trước danh từ (because of his sickness); 'despite' chỉ sự tương phản và cũng đi với danh từ; 'however' không nối hai vế trong cùng câu."
           },
           {
-            "question": "Which sentence is correct?",
-            "options": [
-              "Although it was cold, but we went swimming.",
-              "Although it was cold, so we went swimming.",
-              "Although was cold, we went swimming.",
-              "Although it was cold, we went swimming."
+            "type": "translate",
+            "prompt_vi": "Mặc dù trời mưa, chúng tôi vẫn ra ngoài.",
+            "answers": [
+              "Although it was raining, we still went out.",
+              "Although it was raining, we went out.",
+              "Although it rained, we still went out."
             ],
-            "answer": 3,
-            "explain_vi": "'Although' tự nó đã diễn tả sự tương phản nên không thêm 'but' hay 'so' — lỗi 'although... but' đến từ thói quen dịch 'mặc dù... nhưng' của tiếng Việt. Câu thứ ba sai vì mệnh đề sau although thiếu chủ ngữ 'it'."
+            "note_vi": "Dùng 'although' + mệnh đề (chủ ngữ + động từ) và KHÔNG thêm 'but' ở vế sau."
           },
           {
-            "question": "Which sentence works best as a topic sentence for a paragraph about the benefits of learning English?",
-            "options": [
-              "For example, many websites are written in English.",
-              "Learning English brings many benefits for your career and studies.",
-              "In conclusion, English is a useful language.",
-              "Second, you can watch films without subtitles."
+            "type": "translate",
+            "prompt_vi": "Chuyến bay bị hoãn vì thời tiết xấu.",
+            "answers": [
+              "The flight was delayed because of the bad weather.",
+              "The flight was delayed because of bad weather."
             ],
-            "answer": 1,
-            "explain_vi": "Câu chủ đề phải nêu ý chính bao quát của cả đoạn. 'For example' và 'Second' là dấu hiệu của câu triển khai; 'In conclusion' là dấu hiệu của câu kết — cả ba đều không thể mở đầu đoạn văn."
+            "note_vi": "Dùng 'because of' + danh từ (thời tiết xấu là danh từ), khác với 'because' đi kèm cả mệnh đề."
           }
         ]
       }
@@ -3392,26 +3336,24 @@ window.LESSONS = [
             "explain_vi": "Mệnh đề If dùng 'had known' (loại 3) nên mệnh đề chính phải là 'would have visited'. 'visited' và 'had visited' không diễn tả kết quả giả định; 'would visit' là kết quả hiện tại, không hợp với việc thăm bệnh trong quá khứ."
           },
           {
-            "question": "Sarah would have finished the marathon if she ___ her ankle in the first kilometre.",
-            "options": [
-              "didn't twist",
-              "wouldn't twist",
-              "hasn't twisted",
-              "hadn't twisted"
+            "type": "translate",
+            "prompt_vi": "Nếu hôm qua trời không mưa, chúng tôi đã đi biển.",
+            "answers": [
+              "If it hadn't rained yesterday, we would have gone to the beach.",
+              "If it had not rained yesterday, we would have gone to the beach.",
+              "If it hadn't rained yesterday, we'd have gone to the beach."
             ],
-            "answer": 3,
-            "explain_vi": "'would have finished' → điều kiện loại 3, mệnh đề If cần quá khứ hoàn thành phủ định 'hadn't twisted'. 'didn't twist' là loại 2; 'wouldn't twist' sai vì không dùng would trong mệnh đề If; 'hasn't twisted' là hiện tại hoàn thành, không dùng ở đây."
+            "note_vi": "Điều kiện loại 3: If + had (not) + V3, mệnh đề chính dùng would have + V3."
           },
           {
-            "question": "Minh isn't a doctor. If he ___ one, he would have known what to do when the passenger collapsed.",
-            "options": [
-              "is",
-              "would be",
-              "were",
-              "will be"
+            "type": "translate",
+            "prompt_vi": "Nếu hồi đó tôi học tiếng Anh thì bây giờ tôi tự tin hơn.",
+            "answers": [
+              "If I had studied English, I would be more confident now.",
+              "If I'd studied English, I would be more confident now.",
+              "If I had studied English, I'd be more confident now."
             ],
-            "answer": 2,
-            "explain_vi": "Điều kiện là sự thật hiện tại không có thật (Minh hiện không phải bác sĩ) → dùng quá khứ đơn giả định 'were'; kết quả trong quá khứ dùng 'would have known' (mixed hiện tại → quá khứ). 'is'/'will be' dùng cho điều kiện có thật; 'would be' không đứng trong mệnh đề If."
+            "note_vi": "Mixed conditional: mệnh đề if ở quá khứ (had + V3) nhưng kết quả ở hiện tại nên dùng would + V (kèm now)."
           }
         ]
       },
@@ -3513,26 +3455,24 @@ window.LESSONS = [
             "explain_vi": "Phàn nàn về hành động lặp lại của người khác và muốn họ thay đổi → wish + would + V: 'would stop'. 'stop' và 'will stop' không đứng sau wish; 'have stopped' sai cấu trúc."
           },
           {
-            "question": "I'd rather you ___ anyone about this for now.",
-            "options": [
-              "don't tell",
-              "won't tell",
-              "didn't tell",
-              "not tell"
+            "type": "translate",
+            "prompt_vi": "Ước gì tôi cao hơn.",
+            "answers": [
+              "I wish I were taller.",
+              "I wish I was taller."
             ],
-            "answer": 2,
-            "explain_vi": "Would rather + người khác + V quá khứ đơn để nói về hiện tại/tương lai: 'I'd rather you didn't tell'. 'don't tell'/'won't tell' là lỗi giữ nguyên thì rất phổ biến; 'not tell' chỉ dùng khi chủ ngữ tự làm ('I'd rather not tell')."
+            "note_vi": "Với wish diễn tả mong ước trái hiện tại, dùng động từ ở quá khứ đơn; riêng to be nên dùng 'were' cho mọi ngôi."
           },
           {
-            "question": "If only Tom ___ his umbrella this morning — he's completely soaked now.",
-            "options": [
-              "brought",
-              "had brought",
-              "would bring",
-              "brings"
+            "type": "translate",
+            "prompt_vi": "Tôi thích ở nhà hơn.",
+            "answers": [
+              "I'd rather stay home.",
+              "I would rather stay home.",
+              "I'd rather stay at home.",
+              "I would rather stay at home."
             ],
-            "answer": 1,
-            "explain_vi": "Hối tiếc việc đã không xảy ra sáng nay (quá khứ) → if only + quá khứ hoàn thành 'had brought'. 'brought' dùng cho mong ước hiện tại; 'would bring' là phàn nàn về thói quen; 'brings' sai thì hoàn toàn."
+            "note_vi": "Would rather luôn đi với động từ nguyên mẫu không 'to' (would rather + V), và có thể rút gọn thành I'd rather."
           }
         ]
       },
@@ -3634,26 +3574,24 @@ window.LESSONS = [
             "explain_vi": "Cấu trúc cố định: No sooner + had + S + V3 + than: 'had she left'. 'she had left' thiếu đảo ngữ; 'she left'/'did she leave' sai thì — vế trước 'than' phải là quá khứ hoàn thành."
           },
           {
-            "question": "Only after the meeting ___ how serious the problem was.",
-            "options": [
-              "we realised",
-              "did we realise",
-              "we did realise",
-              "had we realised"
+            "type": "translate",
+            "prompt_vi": "Không những cô ấy hát hay mà còn chơi piano rất giỏi.",
+            "answers": [
+              "Not only does she sing well, but she also plays the piano very well.",
+              "Not only does she sing beautifully, but she also plays the piano brilliantly.",
+              "Not only does she sing well, but she plays the piano very well too."
             ],
-            "answer": 1,
-            "explain_vi": "Câu mở đầu bằng 'Only after + cụm danh từ' thì mệnh đề chính phải đảo ngữ với trợ động từ: 'did we realise'. 'we realised' không đảo; 'we did realise' đặt sai vị trí trợ động từ; 'had we realised' dùng sai thì."
+            "note_vi": "Sau 'Not only' ở đầu câu phải đảo trợ động từ lên trước chủ ngữ: Not only + does/did + chủ ngữ + động từ nguyên thể; vế sau dùng 'but ... (also)' hoặc thêm 'too' ở cuối."
           },
           {
-            "question": "Little ___ that the decision had already been made.",
-            "options": [
-              "he knew",
-              "he knows",
-              "does he knows",
-              "did he know"
+            "type": "translate",
+            "prompt_vi": "Chưa bao giờ tôi thấy một cảnh đẹp đến vậy.",
+            "answers": [
+              "Never have I seen such a beautiful view.",
+              "Never have I seen such a beautiful scene.",
+              "Never have I seen such beautiful scenery."
             ],
-            "answer": 3,
-            "explain_vi": "'Little' phủ định đứng đầu câu → đảo ngữ với trợ động từ quá khứ: 'did he know' (mốc thời gian quá khứ vì 'had already been made'). 'he knew' không đảo; 'he knows' vừa không đảo vừa sai thì; 'does he knows' chia động từ hai lần — lỗi kinh điển."
+            "note_vi": "Sau 'Never' đầu câu, đảo trợ động từ (have) lên trước chủ ngữ và dùng 'such (a) + tính từ + danh từ' để nhấn mạnh mức độ."
           }
         ]
       },
@@ -3755,26 +3693,25 @@ window.LESSONS = [
             "explain_vi": "Get + NGƯỜI + to V: 'got the interns to organise'. 'organise' (V nguyên thể trần) chỉ đúng với have (have sb do); 'organised' dùng khi tân ngữ là vật; 'organising' sai cấu trúc."
           },
           {
-            "question": "The director ___ to have hidden the company's losses for years.",
-            "options": [
-              "believes",
-              "believed",
-              "is believed",
-              "is believing"
+            "type": "translate",
+            "prompt_vi": "Tuần trước tôi đem xe đi sửa.",
+            "answers": [
+              "I had my car repaired last week.",
+              "I got my car repaired last week.",
+              "Last week I had my car repaired.",
+              "Last week I got my car repaired."
             ],
-            "answer": 2,
-            "explain_vi": "Bị động tường thuật: S + is believed + to have V3 (người ta tin rằng ông ấy đã che giấu). 'believes'/'believed' là chủ động — giám đốc không phải người 'tin'; 'is believing' sai vì believe không chia tiếp diễn."
+            "note_vi": "Nhờ người khác làm: have/get + đồ vật + động từ dạng V3 (quá khứ phân từ), không dùng động từ nguyên thể."
           },
           {
-            "question": "I had the technician ___ the wifi router this morning.",
-            "options": [
-              "check",
-              "to check",
-              "checked",
-              "checking"
+            "type": "translate",
+            "prompt_vi": "Ông ấy được cho là rất giàu.",
+            "answers": [
+              "He is said to be very rich.",
+              "He is believed to be very rich.",
+              "He is thought to be very rich."
             ],
-            "answer": 0,
-            "explain_vi": "Have + NGƯỜI + V nguyên thể trần: 'had the technician check'. 'to check' chỉ đúng với get (get sb to do); 'checked' dùng khi tân ngữ là vật (have the router checked); 'checking' sai cấu trúc."
+            "note_vi": "Bị động tường thuật: chủ ngữ + is said/believed/thought + to + động từ nguyên thể (to be...)."
           }
         ]
       },
@@ -3880,26 +3817,22 @@ window.LESSONS = [
             "explain_vi": "'indicate + cụm danh từ' là động từ học thuật chuẩn (cho thấy). 'tell' cần tân ngữ chỉ người (tell us that...); 'say' cần mệnh đề chứ không đi thẳng với cụm danh từ này; 'speak' không nhận tân ngữ kiểu này."
           },
           {
-            "question": "Sarah has ___ a lot of research on Vietnamese street food.",
-            "options": [
-              "made",
-              "taken",
-              "given",
-              "done"
+            "type": "translate",
+            "prompt_vi": "Đừng mắc cùng một lỗi lần nữa.",
+            "answers": [
+              "Don't make the same mistake again.",
+              "Do not make the same mistake again."
             ],
-            "answer": 3,
-            "explain_vi": "'do research' là collocation cố định — nghiên cứu là hoạt động nên đi với do. 'made research' là lỗi kinh điển của người Việt do dịch 'làm nghiên cứu'; 'taken'/'given' không đi với research."
+            "note_vi": "'Mắc lỗi' đi với động từ 'make' (make a mistake), đừng dịch chữ 'làm' thành 'do'."
           },
           {
-            "question": "The success of the project largely depends ___ the team's commitment.",
-            "options": [
-              "in",
-              "on",
-              "of",
-              "to"
+            "type": "translate",
+            "prompt_vi": "Nhiều học sinh đã tham gia cuộc thi.",
+            "answers": [
+              "Many students took part in the competition.",
+              "Many students took part in the contest."
             ],
-            "answer": 1,
-            "explain_vi": "'depend on' là cặp động từ + giới từ cố định. Người Việt hay chọn 'in/into' vì dịch 'phụ thuộc VÀO'; 'of' nhầm với danh từ (independent of); 'to' không đi với depend."
+            "note_vi": "'Tham gia' là cụm cố định 'take part in' + danh từ, nhớ giữ giới từ 'in'."
           }
         ]
       },
@@ -4001,26 +3934,23 @@ window.LESSONS = [
             "explain_vi": "Thesis tốt phải nêu RÕ quan điểm và lý do chính. Câu 4 làm đúng điều đó. Câu 1 chỉ là định nghĩa; câu 2 liệt kê lan man không có quan điểm; câu 3 quá chung chung, không cho biết người viết nghĩ gì."
           },
           {
-            "question": "___ he had never written an essay in English before, Minh got a high score in the writing test.",
-            "options": [
-              "Despite",
-              "Although",
-              "In spite of",
-              "However"
+            "type": "translate",
+            "prompt_vi": "Anh trai tôi thích cà phê, còn tôi thích trà.",
+            "answers": [
+              "My brother likes coffee, whereas I like tea.",
+              "My brother likes coffee, while I like tea."
             ],
-            "answer": 1,
-            "explain_vi": "Sau chỗ trống là mệnh đề đầy đủ 'he had never written...' → dùng Although + mệnh đề. 'Despite' và 'In spite of' chỉ đi với danh từ/V-ing; 'However' không nối trực tiếp hai mệnh đề trong cùng một câu kiểu này."
+            "note_vi": "Dùng 'whereas' hoặc 'while' để nối hai mệnh đề trái ngược; sau nó phải là một mệnh đề đầy đủ (chủ ngữ + động từ)."
           },
           {
-            "question": "My hometown is quiet and peaceful, ___ Ho Chi Minh City is crowded and full of energy.",
-            "options": [
-              "whereas",
-              "despite",
-              "furthermore",
-              "consequently"
+            "type": "translate",
+            "prompt_vi": "Dù mệt, cô ấy vẫn hoàn thành bài luận.",
+            "answers": [
+              "Despite being tired, she finished the essay.",
+              "In spite of being tired, she finished the essay.",
+              "Although she was tired, she finished the essay."
             ],
-            "answer": 0,
-            "explain_vi": "So sánh tương phản giữa HAI chủ thể (quê tôi >< TP.HCM) → 'whereas'. 'despite' cần danh từ theo sau; 'furthermore' bổ sung ý cùng chiều; 'consequently' chỉ quan hệ nhân quả — cả hai đều sai nghĩa."
+            "note_vi": "Quy tắc vàng: Despite/In spite of + danh từ hoặc V-ing; còn Although đi với cả một mệnh đề (chủ ngữ + động từ)."
           }
         ]
       }

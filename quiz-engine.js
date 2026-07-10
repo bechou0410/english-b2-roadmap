@@ -24,7 +24,27 @@
      Cấu trúc: div.quiz-q > [div.q-passage (đoạn đọc, nếu có)] + fieldset > legend (chỉ câu hỏi) + options.
      Đoạn đọc để NGOÀI legend (nối bằng aria-describedby) để screen reader
      không phải đọc cả đoạn văn làm tên của radio group. */
+  /* Câu DỊCH VI→EN: người học tự gõ câu tiếng Anh (không phải trắc nghiệm).
+     Chấm bằng translate-grade.js lúc nộp bài. */
+  function translateCard(q, name, number) {
+    var card = el("div", "quiz-q quiz-q-translate");
+    card.dataset.qtype = "translate";
+    var fs = el("fieldset", "quiz-fieldset");
+    fs.innerHTML =
+      '<legend class="quiz-q-legend"><span class="quiz-q-num">' + number + "</span>" +
+      '<span class="quiz-q-text"><span class="quiz-translate-tag">Dịch sang tiếng Anh</span>' + esc(q.prompt_vi) + "</span></legend>";
+    var inputWrap = el("div", "quiz-translate-in");
+    inputWrap.innerHTML =
+      '<input type="text" class="quiz-translate-input" id="' + esc(name) + '-in" lang="en" ' +
+      'autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" ' +
+      'placeholder="Viết câu tiếng Anh của bạn…" aria-label="Bản dịch tiếng Anh câu ' + number + '">';
+    fs.appendChild(inputWrap);
+    card.appendChild(fs);
+    return card;
+  }
+
   function questionCard(q, name, number) {
+    if (q.type === "translate") return translateCard(q, name, number);
     var card = el("div", "quiz-q");
     var parts = String(q.question).split(/\n\n+/);
     var main = esc(parts.pop()).replace(/\n/g, "<br>");
@@ -59,6 +79,41 @@
   function selectedIndex(card) {
     var input = card.querySelector("input:checked");
     return input ? Number(input.value) : null;
+  }
+
+  /* "đã trả lời chưa" — dùng chung cho cả trắc nghiệm lẫn câu dịch */
+  function cardAnswered(card) {
+    if (card.dataset.qtype === "translate") {
+      var inp = card.querySelector(".quiz-translate-input");
+      return !!(inp && inp.value.trim());
+    }
+    return selectedIndex(card) != null;
+  }
+
+  /* Chấm câu DỊCH: khoá ô nhập, hiện đúng/sai + diff từng từ + bản mẫu + ghi chú.
+     Đạt (tính là 1 câu đúng) khi điểm hiệu lực >= 80% và không lỗi ngữ pháp. */
+  function markTranslate(card, q) {
+    card.classList.add("is-graded");
+    var input = card.querySelector(".quiz-translate-input");
+    var res = window.TranslateGrade.grade(input.value, q.answers, 80);
+    var pass = res.effective >= 80;
+    input.disabled = true;
+    input.classList.add(pass ? "is-correct" : "is-wrong");
+    var verdict, cls = pass ? "ok" : "no";
+    if (res.kind === "correct") verdict = "<b>Chính xác.</b>";
+    else if (res.kind === "grammar")
+      verdict = '<b class="grev-bad">Lỗi ngữ pháp — tính là chưa đạt</b> (khớp ' + res.best +
+        "% số từ): " + res.issues.map(esc).join("; ") + ".";
+    else if (res.kind === "near") verdict = "<b>Gần đúng (" + res.best + "%).</b> So từng từ với bản mẫu:";
+    else if (!input.value.trim()) verdict = "<b>Bạn bỏ trống câu này.</b> Bản mẫu:";
+    else verdict = "<b>Chưa khớp (" + res.best + "%).</b> So với bản mẫu:";
+    var expl = el("div", "quiz-explain " + cls,
+      verdict +
+      (res.diffHtml ? '<p class="word-diff" lang="en">' + res.diffHtml + "</p>" : "") +
+      '<div class="model-answer"><p class="panel-label">Bản mẫu</p><p lang="en">' + esc(q.answers[0]) + "</p>" +
+      (q.note_vi ? '<p class="exercise-hint">' + esc(q.note_vi) + "</p>" : "") + "</div>");
+    card.appendChild(expl);
+    return pass;
   }
 
   /* Khoá card sau khi chấm và tô đúng/sai + giải thích.
@@ -110,15 +165,14 @@
     footer.appendChild(submit);
     form.appendChild(footer);
 
-    /* người dùng đổi câu trả lời → cảnh báo bỏ trống cũ hết hiệu lực */
-    form.addEventListener("change", function () {
-      delete form.dataset.confirmedBlank;
-      status.textContent = "";
-    });
+    /* người dùng đổi câu trả lời / gõ bản dịch → cảnh báo bỏ trống cũ hết hiệu lực */
+    function clearBlankWarn() { delete form.dataset.confirmedBlank; status.textContent = ""; }
+    form.addEventListener("change", clearBlankWarn);
+    form.addEventListener("input", clearBlankWarn);
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      var unanswered = cards.filter(function (c) { return selectedIndex(c) == null; }).length;
+      var unanswered = cards.filter(function (c) { return !cardAnswered(c); }).length;
       if (unanswered > 0 && !form.dataset.confirmedBlank) {
         status.textContent = "Còn " + unanswered + " câu chưa trả lời — bấm Nộp bài lần nữa nếu muốn nộp luôn.";
         form.dataset.confirmedBlank = "1";
@@ -126,7 +180,9 @@
       }
       var correct = 0;
       cards.forEach(function (card, i) {
-        if (markCard(card, questions[i], selectedIndex(card))) correct++;
+        var q = questions[i];
+        var ok = q.type === "translate" ? markTranslate(card, q) : markCard(card, q, selectedIndex(card));
+        if (ok) correct++;
       });
       submit.remove();
       status.textContent = "";
@@ -220,6 +276,7 @@
      chữ cái A/B/C/D nên an toàn. */
   function shuffleOptions(questions) {
     return questions.map(function (q) {
+      if (q.type === "translate" || !q.options) return q; /* câu dịch: không có lựa chọn để xáo */
       var order = [0, 1, 2, 3];
       for (var i = order.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));

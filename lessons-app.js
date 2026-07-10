@@ -161,7 +161,7 @@
 
     var head = el("div", "practice-head");
     head.appendChild(el("h2", null, "Luyện tập nhanh"));
-    head.appendChild(el("p", "section-lede", "5 câu áp dụng đúng nội dung vừa học. Sai cũng không sao — phần giải thích mới là thứ đáng đọc nhất."));
+    head.appendChild(el("p", "section-lede", "5 câu áp dụng đúng nội dung vừa học — gồm trắc nghiệm và <b>dịch câu Việt → Anh</b> (tự gõ, máy chấm ngay). Sai cũng không sao — phần giải thích mới là thứ đáng đọc nhất."));
     wrap.appendChild(head);
 
     var quizBox = el("div");

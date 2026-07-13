@@ -78,27 +78,110 @@
     return issues;
   }
 
-  /* Chấm gộp: so bản dịch của người dùng với TẤT CẢ đáp án chấp nhận, lấy kết
-     quả tốt nhất. Trả về best% + effective (đã trừ điểm nếu lỗi ngữ pháp) +
-     kind ("correct" | "grammar" | "near" | "low") + diff + danh sách lỗi. */
-  function grade(userText, answers, passPct) {
-    passPct = passPct || 80;
-    var mineWords = normWords(userText);
-    var mine = mineWords.join(" ");
-    var best = 0, bestMissed = [], bestDiff = "";
-    (answers || []).forEach(function (ans) {
-      var pct, missed, diffHtml;
-      if (normWords(ans).join(" ") === mine) { pct = 100; missed = []; diffHtml = ""; }
-      else { var r = compare(ans, userText); pct = r.pct; missed = r.missed; diffHtml = r.diffHtml; }
-      if (pct > best) { best = pct; bestMissed = missed; bestDiff = diffHtml; }
+  function span(cls, w) { return '<span class="' + cls + '">' + esc(w) + "</span>"; }
+
+  /* So bản dịch của người dùng với MỘT đáp án mẫu theo CẢ HAI chiều:
+     - recall = bao nhiêu từ của bản mẫu được khớp (bạn có thiếu từ không).
+     - precision = bao nhiêu từ BẠN viết nằm trong bản mẫu (bạn có viết sai/thừa từ không).
+     Nhờ precision mới phân biệt được "thiếu từ" với "dùng SAI từ". */
+  function analyzeAnswer(answer, userWords) {
+    var model = normWords(answer);
+    var modelMatched = lcsMatch(model, userWords); /* index từ MẪU được khớp */
+    var userMatched = lcsMatch(userWords, model);   /* index từ NGƯỜI DÙNG có trong mẫu */
+    var recall = model.length ? modelMatched.size / model.length : 0;
+    var precision = userWords.length ? userMatched.size / userWords.length : 0;
+    var f1 = precision + recall ? (2 * precision * recall) / (precision + recall) : 0;
+    return {
+      answer: answer, model: model, recall: recall, precision: precision, f1: f1,
+      missed: model.filter(function (w, i) { return !modelMatched.has(i); }),   /* từ mẫu người dùng THIẾU */
+      extra: userWords.filter(function (w, i) { return !userMatched.has(i); }),  /* từ người dùng viết SAI/THỪA */
+      modelDiff: model.map(function (w, i) { return span(modelMatched.has(i) ? "w-ok" : "w-miss", w); }).join(" "),
+      userDiff: userWords.map(function (w, i) { return span(userMatched.has(i) ? "w-ok" : "w-bad", w); }).join(" "),
+    };
+  }
+
+  /* Từ danh sách thiếu/thừa → mô tả lỗi CỤ THỂ: chia sai dạng, dùng sai từ (ghép
+     từ thừa với từ mẫu bị thiếu), thiếu từ. Phân loại lỗi ngữ pháp vs lỗi từ vựng. */
+  function describeIssues(a) {
+    var missed = a.missed.slice(), issues = [], hasGrammarErr = false, hasWordErr = false;
+    a.extra.forEach(function (u) {
+      var fi = missed.findIndex(function (m) { return m !== u && stemWord(u).length >= 3 && stemWord(m) === stemWord(u); });
+      if (fi >= 0) { issues.push("chia sai dạng: bạn viết “" + u + "”, cần “" + missed[fi] + "”"); missed.splice(fi, 1); hasGrammarErr = true; return; }
+      var ci = missed.findIndex(function (m) { return !GRAMMAR_WORDS[m]; });
+      if (!GRAMMAR_WORDS[u] && ci >= 0) { issues.push("bạn dùng “" + u + "”, bản mẫu dùng “" + missed[ci] + "”"); missed.splice(ci, 1); hasWordErr = true; return; }
+      issues.push("thừa/sai từ “" + u + "”");
+      if (GRAMMAR_WORDS[u]) hasGrammarErr = true; else hasWordErr = true;
     });
-    var issues = best > 0 && best < 100 ? grammarIssues(bestMissed, mineWords) : [];
-    var effective = best, kind;
-    if (best === 100) kind = "correct";
-    else if (issues.length) { effective = Math.min(best, 60); kind = "grammar"; }
-    else if (best >= passPct) kind = "near";
-    else kind = "low";
-    return { best: best, effective: effective, kind: kind, issues: issues, missed: bestMissed, diffHtml: bestDiff };
+    missed.forEach(function (m) {
+      issues.push("thiếu từ “" + m + "”");
+      if (GRAMMAR_WORDS[m]) hasGrammarErr = true;
+    });
+    return { issues: issues, hasGrammarErr: hasGrammarErr, hasWordErr: hasWordErr };
+  }
+
+  /* Chấm gộp với TẤT CẢ đáp án chấp nhận, lấy đáp án khớp nhất (F1 cao nhất).
+     ĐẠT khi: khớp tuyệt đối, HOẶC không viết từ nào sai + không thiếu từ ngữ
+     pháp + phủ >= ngưỡng (chỉ bỏ bớt từ phụ như trạng từ thì vẫn tính đúng).
+     kind: correct | accepted | word | grammar | incomplete | empty. */
+  function grade(userText, answers, passPct) {
+    passPct = (passPct || 80) / 100;
+    var userWords = normWords(userText);
+    var model0 = (answers && answers[0]) || "";
+    if (!userWords.length)
+      return { best: 0, pass: false, kind: "empty", issues: [], modelDiff: "", userDiff: "", model: model0 };
+
+    var best = null;
+    (answers || []).forEach(function (ans) {
+      var a = analyzeAnswer(ans, userWords);
+      if (!best || a.f1 > best.f1) best = a;
+    });
+    if (!best)
+      return { best: 0, pass: false, kind: "empty", issues: [], modelDiff: "", userDiff: "", model: model0 };
+
+    var exact = best.recall === 1 && best.precision === 1;
+    var info = describeIssues(best);
+    var onlyOptionalOmitted = best.extra.length === 0 &&
+      best.missed.every(function (w) { return !GRAMMAR_WORDS[w]; });
+    var pass = exact || (onlyOptionalOmitted && best.recall >= passPct);
+    var kind = exact ? "correct"
+      : pass ? "accepted"
+      : info.hasWordErr ? "word"
+      : info.hasGrammarErr ? "grammar"
+      : "incomplete";
+    return {
+      best: Math.round(best.f1 * 100), pass: pass, kind: kind, issues: info.issues,
+      modelDiff: best.modelDiff, userDiff: best.userDiff, model: best.answer,
+      recall: Math.round(best.recall * 100), precision: Math.round(best.precision * 100),
+    };
+  }
+
+  /* Dựng phần giải thích (nhận xét + diff + bản mẫu) từ kết quả grade(). Dùng
+     CHUNG cho câu dịch trong bài học và phần Viết ở trang Luyện kỹ năng. */
+  function feedbackHtml(res, modelAnswer, note) {
+    /* nhiều lỗi thì chỉ nêu vài lỗi đầu cho dễ đọc, còn lại xem ở bản mẫu */
+    var shown = res.issues.slice(0, 4);
+    var issueText = shown.map(esc).join("; ") + (res.issues.length > shown.length ? "; …" : "");
+    if (!res.issues.length) issueText = "";
+    var head;
+    if (res.kind === "correct") head = "<b>Chính xác.</b>";
+    else if (res.kind === "accepted")
+      head = "<b>Đúng rồi.</b> Bản mẫu đầy đủ hơn — câu của bạn vẫn được chấp nhận" +
+        (issueText ? " (chỉ thiếu: " + issueText + ")" : "") + ".";
+    else if (res.kind === "word") head = '<b class="grev-bad">Sai/khác từ — chưa đạt.</b> ' + issueText + ".";
+    else if (res.kind === "grammar") head = '<b class="grev-bad">Lỗi ngữ pháp — chưa đạt.</b> ' + issueText + ".";
+    else if (res.kind === "empty") head = "<b>Bạn bỏ trống câu này.</b>";
+    else head = "<b>Chưa đủ ý (khớp " + res.best + "%) — chưa đạt.</b>" + (issueText ? " " + issueText + "." : "");
+
+    var diff = "";
+    if ((res.kind === "word" || res.kind === "grammar") && res.userDiff)
+      diff = '<p class="wd-label">Câu của bạn</p><p class="word-diff" lang="en">' + res.userDiff + "</p>";
+    else if ((res.kind === "accepted" || res.kind === "incomplete") && res.modelDiff)
+      diff = '<p class="wd-label">Bản mẫu (gạch đỏ là chỗ bạn thiếu)</p><p class="word-diff" lang="en">' + res.modelDiff + "</p>";
+
+    var model = res.kind === "correct" ? "" :
+      '<div class="model-answer"><p class="panel-label">Bản mẫu</p><p lang="en">' + esc(modelAnswer) + "</p>" +
+      (note ? '<p class="exercise-hint">' + esc(note) + "</p>" : "") + "</div>";
+    return head + diff + model;
   }
 
   window.TranslateGrade = {
@@ -106,5 +189,6 @@
     compare: compare,
     grammarIssues: grammarIssues,
     grade: grade,
+    feedbackHtml: feedbackHtml,
   };
 })();

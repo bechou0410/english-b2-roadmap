@@ -90,30 +90,17 @@
     return selectedIndex(card) != null;
   }
 
-  /* Chấm câu DỊCH: khoá ô nhập, hiện đúng/sai + diff từng từ + bản mẫu + ghi chú.
-     Đạt (tính là 1 câu đúng) khi điểm hiệu lực >= 80% và không lỗi ngữ pháp. */
+  /* Chấm câu DỊCH: khoá ô nhập, nêu ĐÚNG lỗi + diff + bản mẫu (dùng chung
+     TranslateGrade.feedbackHtml). Trả về true nếu ĐẠT (tính là 1 câu đúng). */
   function markTranslate(card, q) {
     card.classList.add("is-graded");
     var input = card.querySelector(".quiz-translate-input");
     var res = window.TranslateGrade.grade(input.value, q.answers, 80);
-    var pass = res.effective >= 80;
     input.disabled = true;
-    input.classList.add(pass ? "is-correct" : "is-wrong");
-    var verdict, cls = pass ? "ok" : "no";
-    if (res.kind === "correct") verdict = "<b>Chính xác.</b>";
-    else if (res.kind === "grammar")
-      verdict = '<b class="grev-bad">Lỗi ngữ pháp — tính là chưa đạt</b> (khớp ' + res.best +
-        "% số từ): " + res.issues.map(esc).join("; ") + ".";
-    else if (res.kind === "near") verdict = "<b>Gần đúng (" + res.best + "%).</b> So từng từ với bản mẫu:";
-    else if (!input.value.trim()) verdict = "<b>Bạn bỏ trống câu này.</b> Bản mẫu:";
-    else verdict = "<b>Chưa khớp (" + res.best + "%).</b> So với bản mẫu:";
-    var expl = el("div", "quiz-explain " + cls,
-      verdict +
-      (res.diffHtml ? '<p class="word-diff" lang="en">' + res.diffHtml + "</p>" : "") +
-      '<div class="model-answer"><p class="panel-label">Bản mẫu</p><p lang="en">' + esc(q.answers[0]) + "</p>" +
-      (q.note_vi ? '<p class="exercise-hint">' + esc(q.note_vi) + "</p>" : "") + "</div>");
-    card.appendChild(expl);
-    return pass;
+    input.classList.add(res.pass ? "is-correct" : "is-wrong");
+    card.appendChild(el("div", "quiz-explain " + (res.pass ? "ok" : "no"),
+      window.TranslateGrade.feedbackHtml(res, q.answers[0], q.note_vi)));
+    return res.pass;
   }
 
   /* Khoá card sau khi chấm và tô đúng/sai + giải thích.

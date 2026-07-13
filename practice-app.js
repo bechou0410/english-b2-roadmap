@@ -89,7 +89,7 @@
      Dùng chung từ translate-grade.js (window.TranslateGrade) — cùng một bộ chấm
      với câu dịch trong bài học, tránh lệch tiêu chí giữa hai nơi. */
   var TG = window.TranslateGrade;
-  var normWords = TG.normWords, compare = TG.compare, grammarIssues = TG.grammarIssues;
+  var compare = TG.compare; /* nghe/nói dùng so khớp từ; viết dùng TG.grade + TG.feedbackHtml */
 
   /* badge % tốt nhất trên card bài đã làm */
   function bestBadge(text, pass) {
@@ -370,36 +370,14 @@
       card.addEventListener("click", function (e) {
         if (!e.target.dataset || e.target.dataset.act !== "check") return;
         if (!input.value.trim()) { result.textContent = "Viết bản dịch của bạn rồi mới chấm nhé."; return; }
-        var mineWords = normWords(input.value);
-        var mine = mineWords.join(" ");
-        var best = 0, bestMissed = [];
-        item.answers.forEach(function (ans) {
-          var pct, missed;
-          if (normWords(ans).join(" ") === mine) { pct = 100; missed = []; }
-          else { var r = compare(ans, input.value); pct = r.pct; missed = r.missed; }
-          if (pct > best) { best = pct; bestMissed = missed; }
-        });
-        /* gần đúng về số từ nhưng dính lỗi ngữ pháp = lỗi nghiêm trọng, không đạt */
-        var issues = best > 0 && best < 100 ? grammarIssues(bestMissed, mineWords) : [];
-        var effective = best;
-        var verdict;
-        if (best === 100) {
-          verdict = "<b>Chính xác.</b>";
-        } else if (issues.length) {
-          effective = Math.min(best, 60);
-          verdict = '<b class="grev-bad">Lỗi ngữ pháp — tính là chưa đạt</b> (khớp ' + best + "% số từ): " +
-            issues.map(esc).join("; ") + ".";
-        } else if (best >= PASS_PCT) {
-          verdict = "<b>Gần đúng (" + best + "%).</b> So từng từ với bản mẫu:";
-        } else {
-          verdict = "<b>Chưa khớp (" + best + "%).</b> So với bản mẫu:";
-        }
-        result.innerHTML = verdict +
-          '<div class="model-answer"><p class="panel-label">Bản mẫu</p><p lang="en">' + esc(item.answers[0]) + "</p>" +
-          '<p class="exercise-hint">' + esc(item.note_vi) + "</p></div>";
+        /* dùng chung bộ chấm với câu dịch trong bài học */
+        var res = TG.grade(input.value, item.answers, PASS_PCT);
+        result.innerHTML = TG.feedbackHtml(res, item.answers[0], item.note_vi);
+        /* điểm lưu: ĐẠT thì >= ngưỡng (tính hoàn thành), chưa đạt thì kẹp dưới ngưỡng */
+        var effective = res.pass ? Math.max(res.best, PASS_PCT) : Math.min(res.best, PASS_PCT - 10);
         markDone(key, effective, card);
-        if (effective >= PASS_PCT) card.classList.add("is-done");
         var bestSaved = get(key);
+        if (bestSaved && Number(bestSaved.best) >= PASS_PCT) card.classList.add("is-done");
         if (bestSaved) setBestBadge(card, "Tốt nhất " + Number(bestSaved.best) + "%", Number(bestSaved.best) >= PASS_PCT);
       });
       box.appendChild(card);
